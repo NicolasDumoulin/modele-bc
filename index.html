@@ -1,0 +1,322 @@
+ 
+<html>
+    <head>
+        <title>Bounded Confidence</title>
+        <link href="css/bootstrap-3.3.6.min.css" rel="stylesheet">
+        <script type="text/javascript"  src="js/plotly-latest.min.js"></script>
+        <script type="text/javascript" src="js/population.js"></script>
+        <script type="text/javascript" src="js/jquery-2.2.0.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap-3.3.6.min.js"></script>
+    </head>
+    <body>
+        <div class="modal fade" id="confirm-stop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog"><div class="modal-content">
+                    <div class="modal-header"><h4 class="modal-title" id="myModalLabel">Confirmation</h4></div>
+                    <div class="modal-body">Are you sure to stop this simulation and to reset all the results?</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button id="stop-confirmed" type="button" class="btn btn-danger danger">Stop</button>
+                    </div>
+                </div>
+            </div>
+        </div>                
+        <div class="container">
+            <form class="form-inline">
+                <div class="form-group">
+                    <div class="input-group col-xs-4">
+                        <span class="input-group-addon">Nb steps to run</span>
+                        <input type="number" class="form-control" id="nbSteps" value="100">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
+                        <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
+                        <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
+                    </div>
+                </div>
+            </form>
+            <div class="input-group">
+                <span class="input-group-addon">Iteration</span>
+                <span class="input-group-addon" id="iterationSlider-val">0</span>
+                <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
+                <span class="input-group-addon" id="iterationSlider-max">100</span>
+            </div>
+            <!-- Nav tabs -->
+            <ul id="tabs" class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#config" aria-controls="config" role="tab" data-toggle="tab">Config</a></li>
+                <li role="presentation"><a href="#plot" aria-controls="plot" role="tab" data-toggle="tab">Plot</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="config">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="popSizeInput"  class="col-sm-4">Pop size</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="popSizeInput" value="500">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pe"  class="col-sm-4">Part of extremist</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="pe" value="0.0" step="0.1" min="0" max="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="mu0"  class="col-sm-4">mu 1</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="mu0" value="0.5" step="0.1" min="0" max="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="mu1"  class="col-sm-4">mu 2</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="mu1" value="0.5" step="0.1" min="0" max="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="valBaseIncert0"  class="col-sm-4">val base incert 1</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="valBaseIncert0" value="0.3" step="0.1" min="0" max="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="valBaseIncert1"  class="col-sm-4">val base incert 2</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="valBaseIncert1" value="0.1" step="0.1" min="0" max="1">
+                            </div>
+                        </div>
+                        <!--div class="form-group">
+                            <label for="partCertains0"  class="col-sm-4">part certains 1</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="partCertains0" value="0.0" step="0.1" min="0" max="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="partCertains1"  class="col-sm-4">part certains 2</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="partCertains1" value="0.0" step="0.1" min="0" max="1">
+                            </div>
+                        </div-->
+                        <div class="form-group">
+                            <label for="typeRencontre"  class="col-sm-4">Type rencontre</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="typeRencontre">
+                                    <option value="0">PBC JDM</option>
+                                    <option value="1">BC simple</option>
+                                    <option value="2">Relative Agreement</option>
+                                    <option value="3">MouvARNonHierarchise</option>
+                                    <option value="4" selected="selected">MouvARHierarchise</option>
+                                    <option value="5">MouvARNonHierUncEvolve</option>
+                                    <option value="6">MouvAREtUncHierarchise</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="plot">
+                    <div id="plotly"></div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function plot(x, y) {
+                var trace1 = {
+                    x: x,
+                    y: y,
+                    mode: 'markers',
+                    name: 'points',
+                    marker: {
+                        color: 'rgb(102,0,0)',
+                        size: 2,
+                        opacity: 0.4
+                    },
+                    type: 'scatter'
+                };
+                var trace2 = {
+                    x: x,
+                    y: y,
+                    name: 'density',
+                    ncontours: 20,
+                    colorscale: 'Hot',
+                    reversescale: true,
+                    showscale: true,
+                    type: 'histogram2dcontour'
+                };
+                var trace3 = {
+                    x: x,
+                    name: 'x density',
+                    marker: {color: 'rgb(102,0,0)'},
+                    yaxis: 'y2',
+                    type: 'histogram'
+                };
+                var trace4 = {
+                    y: y,
+                    name: 'y density',
+                    marker: {color: 'rgb(102,0,0)'},
+                    xaxis: 'x2',
+                    type: 'histogram'
+                };
+                var data = [trace1, trace2, trace3, trace4];
+                var layout = {
+                    showlegend: false,
+                    autosize: false,
+                    width: 600,
+                    height: 550,
+                    margin: {t: 50},
+                    hovermode: 'closest',
+                    bargap: 0,
+                    xaxis: {
+                        range: [-1, 1],
+                        autorange: false,
+                        domain: [0, 0.8],
+                        showgrid: false,
+                        zeroline: false
+                    },
+                    yaxis: {
+                        range: [-1, 1],
+                        autorange: false,
+                        domain: [0, 0.8],
+                        showgrid: false,
+                        zeroline: false
+                    },
+                    xaxis2: {
+                        domain: [0.85, 1],
+                        showgrid: false,
+                        zeroline: false
+                    },
+                    yaxis2: {
+                        domain: [0.85, 1],
+                        showgrid: false,
+                        zeroline: false
+                    }
+                };
+                p = Plotly.newPlot('plotly', data, layout);
+                return [p, x, y];
+            }
+            var simulationRun = true;
+            var stopIteration = 0;
+            var iteration = 0;
+            var pop;
+            var results = [];
+            function initSimulation() {
+                $('#plotly').empty();
+                results = [];
+                simulationRun = false;
+                iteration = 0;
+                stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
+                itSlider.val(0);
+                itSliderVal.text('0');
+                itSlider.attr('max', stopIteration);
+                itSliderMax.text(stopIteration);
+                setButtonsStates(true, false, true);
+            }
+            function refresh() {
+                if (iteration < results.length) {
+                    plot(results[iteration][0], results[iteration][1]);
+                }
+            }
+            function refreshLoop() {
+                refresh();
+                if (simulationRun) {
+                    setTimeout(refreshLoop, 200);
+                }
+            }
+            function simulation() {
+                if (simulationRun) {
+                    if (results.length === 0) {
+                        pop = new Population(
+                                parseInt($('#popSizeInput').val(), 10),
+                                parseFloat($('#pe').val(), 10),
+                                [parseFloat($('#mu0').val(), 10), parseFloat($('#mu1').val(), 10)],
+                                [parseFloat($('#valBaseIncert0').val(), 10), parseFloat($('#valBaseIncert1').val(), 10)],
+                                parseInt($('#typeRencontre').val(), 10)
+                                );
+                        var x = new Array(pop.parameters.taille);
+                        var y = new Array(pop.parameters.taille);
+                        for (var i = 0; i < pop.parameters.taille; i++) {
+                            x.push(pop.population[i].sBavg[0][0]);
+                            y.push(pop.population[i].sBavg[0][1]);
+                        }
+                        results.push([x, y]);
+                        refresh();
+                    }
+                    iteration = iteration + 1;
+                    pop.iter(iteration);
+                    var x = new Array(pop.parameters.taille);
+                    var y = new Array(pop.parameters.taille);
+                    for (var i = 0; i < pop.parameters.taille; i++) {
+                        x.push(pop.population[i].sBavg[0][0]);
+                        y.push(pop.population[i].sBavg[0][1]);
+                    }
+                    results.push([x, y]);
+                    itSlider.val(iteration);
+                    itSliderVal.text(iteration);
+                    simulationRun = iteration < stopIteration;
+                    setTimeout(simulation, 0);
+                } else {
+                    setButtonsStates(true, false, true);
+                }
+            }
+            var playBtn = $('#play-btn');
+            var pauseBtn = $('#pause-btn');
+            var stopBtn = $('#stop-btn');
+            var itSlider = $("#iterationSlider");
+            var itSliderMax = $("#iterationSlider-max");
+            var itSliderVal = $("#iterationSlider-val");
+            function setButtonsStates(play, pause, stop) {
+                playBtn.prop('disabled', !play);
+                pauseBtn.prop('disabled', !pause);
+                stopBtn.prop('disabled', !stop);
+            }
+            // Controls events
+            /*$('#typeRencontre').on('change', function () {
+             alert('Hop hop hop, pas trop vite.\n'
+             + 'On va attendre un peu pour tester les autres !\n\n'
+             + 'Allez, on reste sur la méthode par défaut\n');
+             $('#typeRencontre').val(4);
+             });*/
+            playBtn.click(function () {
+                $('#config input').prop("disabled", true);
+                $('#config select').prop("disabled", true);
+                $('#tabs a[href="#plot"]').tab('show');
+                simulationRun = true;
+                setButtonsStates(false, true, true);
+                stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
+                itSlider.attr('max', stopIteration);
+                itSliderMax.text(stopIteration);
+                setTimeout(simulation, 0);
+                setTimeout(refreshLoop, 0);
+            });
+            pauseBtn.click(function () {
+                simulationRun = false;
+                setButtonsStates(true, false, true);
+            });
+            $('#stop-confirmed').click(function () {
+                initSimulation();
+                $('#config input').prop("disabled", false);
+                $('#config select').prop("disabled", false);
+                $('#tabs a[href="#config"]').tab('show');
+                $('#confirm-stop').modal('hide');
+            });
+            $('#nbSteps').on("input", function () {
+                var step = iteration + parseInt(this.value, 10);
+                if (iteration === 0) {
+                    itSlider.attr('max', step);
+                    itSliderMax.text(step);
+                }
+                stopIteration = step;
+            });
+            itSlider.on("input", function () {
+                if (this.value > iteration) {
+                    itSlider.val(iteration);
+                } else {
+                    itSliderVal.text(this.value);
+                    plot(results[this.value][0], results[this.value][1]);
+                }
+            });
+            // Ok, we're ready
+            initSimulation();
+        </script>
+    </body>
+</html>
