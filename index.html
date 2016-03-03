@@ -1,7 +1,7 @@
  
 <html>
     <head>
-        <title>Bounded Confidence</title>
+        <title>Various Bounded Confidence</title>
         <link href="css/bootstrap-3.3.6.min.css" rel="stylesheet">
         <script type="text/javascript"  src="js/plotly-latest.min.js"></script>
         <script type="text/javascript" src="js/population.js"></script>
@@ -21,24 +21,40 @@
             </div>
         </div>                
         <div class="container">
-            <form class="form-inline">
-                <div class="form-group">
-                    <div class="input-group col-xs-4">
-                        <span class="input-group-addon">Nb steps to run</span>
-                        <input type="number" class="form-control" id="nbSteps" value="100">
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
-                        <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
-                        <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
-                    </div>
+            <div class="jumbotron">
+                <h1>Various Bounded Confidence</h1>
+                <p class="lead">Discover the dynamics of bounded confidence models described in
+                    <a href="http://jasss.soc.surrey.ac.uk/19/1/6.html" title="Mathias, Jean-Denis, Huet, Sylvie and Deffuant, Guillaume (2016) 'Bounded Confidence Model with Fixed Uncertainties and Extremists: The Opinions Can Keep Fluctuating Indefinitely' Journal of Artificial Societies and Social Simulation 19 (1) 6">(Deffuant et al., 2016)</a>
+                </p>
+            </div>
+            <!--div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Help</h3>
                 </div>
-            </form>
-            <div class="input-group">
-                <span class="input-group-addon">Iteration</span>
-                <span class="input-group-addon" id="iterationSlider-val">0</span>
-                <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
-                <span class="input-group-addon" id="iterationSlider-max">100</span>
+                <div class="panel-body">
+                    
+                </div>
+            </div-->
+            <div>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <div class="input-group col-sm-4">
+                            <span class="input-group-addon">Nb steps to run</span>
+                            <input type="number" class="form-control" id="nbSteps" value="100">
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
+                            <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
+                            <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
+                        </div>
+                    </div>
+                </form>
+                <div class="input-group">
+                    <span class="input-group-addon">Iteration</span>
+                    <span class="input-group-addon" id="iterationSlider-val">0</span>
+                    <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
+                    <span class="input-group-addon" id="iterationSlider-max">100</span>
+                </div>
             </div>
             <!-- Nav tabs -->
             <ul id="tabs" class="nav nav-tabs" role="tablist">
