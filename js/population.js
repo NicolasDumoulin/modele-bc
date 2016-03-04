@@ -27,8 +27,7 @@ function Individual(parameters) {
         this.poids = [0.0, 0.0];
     }
     this.nSb = parameters.nbSubjBelief;
-    //for (var i=0; i<parameters.mu.length;i++) 
-    this.mu = parameters.mu; // / parameters.muDiv;
+    this.mu = parameters.mu;
     this.sBavg = matrix(parameters.nbObjetsConnus, this.nSb, 0.0);
     this.sBavgInit = matrix(parameters.nbObjetsConnus, this.nSb, 0.0);
     this.sBunc = matrix(parameters.nbObjetsConnus, this.nSb, 0.0);
@@ -40,13 +39,15 @@ Individual.prototype.isExtremist = function () {
 Individual.prototype.setExtremist = function (opinion) {
     this.sBavg[0][0] = opinion;
     this.sBunc[0][0] === 0.0001;
+    this.sBavg[0][1] = opinion;
+    this.sBunc[0][1] === 0.0001;
 };
 Individual.prototype.distance = function (indiv) {
     var distance = 0;
     for (var obj = 0; obj < this.nSb; obj++) {
         distance += Math.pow(this.sBavg[0][obj] - indiv.sBavg[0][obj], 2);
     }
-    return distance;
+    return Math.sqrt(distance);
 };
 
 function range(n) {
@@ -57,11 +58,6 @@ function range(n) {
 
 
 function Population(popSize, pe, egoInvolvedPart, mu, valBaseIncert, type) {
-    if (egoInvolvedPart === 0) {
-        type = 1;
-    } else {
-        type = 4;
-    }
     this.parameters = {"nbReplicats": 1, "nbStep": 100000, "taille": popSize,
         "partExtremist": pe,
         "highlyEngaged": egoInvolvedPart,
@@ -69,7 +65,8 @@ function Population(popSize, pe, egoInvolvedPart, mu, valBaseIncert, type) {
         "mu": mu,
         "muDiv": [1.0, 1.0],
         "muPartDiv": [0.0, 0.0],
-        "typeRencontre": type, "posMuFort": 0.0, "typeInitBeliefAvg": "U",
+        // default type is 4
+        "typeRencontre": 4, "posMuFort": 0.0, "typeInitBeliefAvg": "U",
         "valBaseIncert": valBaseIncert,
         "diviseursU0": 1.0, "diviseursU1": 1.0, "partCertains0": 0.0,
         "partCertains1": 0.0,

@@ -23,8 +23,8 @@
         <div class="container">
             <div class="jumbotron">
                 <h1>Various Bounded Confidence</h1>
-                <p class="lead">Discover the dynamics of bounded confidence models described in
-                    <a href="http://jasss.soc.surrey.ac.uk/19/1/6.html" title="Mathias, Jean-Denis, Huet, Sylvie and Deffuant, Guillaume (2016) 'Bounded Confidence Model with Fixed Uncertainties and Extremists: The Opinions Can Keep Fluctuating Indefinitely' Journal of Artificial Societies and Social Simulation 19 (1) 6">(Deffuant et al., 2016)</a>
+                <p class="lead">Discover the dynamics of bounded confidence models<!-- described in
+                    <a href="http://jasss.soc.surrey.ac.uk/19/1/6.html" title="Mathias, Jean-Denis, Huet, Sylvie and Deffuant, Guillaume (2016) 'Bounded Confidence Model with Fixed Uncertainties and Extremists: The Opinions Can Keep Fluctuating Indefinitely' Journal of Artificial Societies and Social Simulation 19 (1) 6">(Deffuant et al., 2016)</a-->
                 </p>
             </div>
             <!--div class="panel panel-default">
@@ -61,7 +61,6 @@
                 <li role="presentation" class="active"><a href="#config" aria-controls="config" role="tab" data-toggle="tab">Config</a></li>
                 <li role="presentation"><a href="#plots" aria-controls="plots" role="tab" data-toggle="tab">Plots</a></li>
             </ul>
-
             <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="config">
@@ -108,7 +107,7 @@
                                 <input type="number" class="form-control" id="valBaseIncert1" value="0.1" step="0.1" min="0" max="1">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <!--div class="form-group">
                             <label for="typeRencontre"  class="col-sm-4">Type rencontre</label>
                             <div class="col-sm-4">
                                 <select class="form-control" id="typeRencontre">
@@ -119,17 +118,21 @@
                                     <option value="4" selected="selected">MouvARHierarchise</option>
                                 </select>
                             </div>
-                        </div>
+                        </div-->
                     </form>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="plots">
+                    <div class="col-lg-12">
+                        <button type="button" id="opinions-visibility-btn" class="btn btn-default" data-toggle="button" aria-pressed="false" autocomplete="off" title="Hiding the plot allow better simulation performance.">
+                            Hide density plot <span class="glyphicon glyphicon-pause"></span></button>
+                    </div>
                     <div class="col-lg-6" id="plot-opinions"></div>
                     <div class="col-lg-6" id="plot-indicators"></div>
                 </div>
             </div>
         </div>
         <script type="text/javascript">
-            function plotOpinions(x, y) {
+            function plotOpinions(x, y, step) {
                 var data = [{
                         x: x,
                         y: y,
@@ -176,7 +179,7 @@
                     zeroline: false
                 };
                 var layout = {
-                    title: 'Opinions densities',
+                    title: 'Opinions densities at step ' + step,
                     showlegend: false,
                     autosize: false,
                     width: 600,
@@ -200,14 +203,14 @@
                     type: 'scatter'
                 };
                 var trace2 = {
-                    name: 'opinion 1 avg',
+                    name: 'opinion 1',
                     x: indicatorsRange,
                     y: indicatorsTs.opAvg0,
                     yaxis: 'y2',
                     type: 'scatter'
                 };
                 var trace3 = {
-                    name: 'opinion 2 avg',
+                    name: 'opinion 2',
                     x: indicatorsRange,
                     y: indicatorsTs.opAvg1,
                     yaxis: 'y2',
@@ -216,7 +219,8 @@
                 var data = [trace1, trace2, trace3];
                 Plotly.newPlot('plot-indicators', data, {width: 600, height: 550, yaxis: {title: 'nb clusters'},
                     yaxis2: {
-                        title: 'opinions avg',
+                        title: 'opinions polarization',
+                        range: [0, 1],
                         overlaying: 'y',
                         side: 'right'
                     }});
@@ -228,6 +232,7 @@
                 indicatorsRange.push(iteration);
             }
             var simulationRun = true;
+            var densityPlotUpdate = 1;
             var stopIteration = 0;
             var iteration = 0;
             var pop;
@@ -236,7 +241,9 @@
             var indicatorsTs = {nbClusters: [], opAvg0: [], opAvg1: []};
             function initSimulation() {
                 $('#plot-opinions').empty();
+                $('#plot-indicators').empty();
                 opinionsTs = [];
+                indicatorsRange = [];
                 simulationRun = false;
                 iteration = 0;
                 stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
@@ -246,10 +253,32 @@
                 itSliderMax.text(stopIteration);
                 setButtonsStates(true, false, true);
             }
+            function toggleDensityPlotUpdate() {
+                if (densityPlotUpdate === 0) {
+                    densityPlotUpdate = 2;
+                } else {
+                    densityPlotUpdate = !densityPlotUpdate + 0;
+                }
+                if (densityPlotUpdate) {
+                    $('#opinions-visibility-btn').html('Hide density plot <span class="glyphicon glyphicon-pause"></span>');
+                    plotOpinions(opinionsTs[iteration][0], opinionsTs[iteration][1], iteration);
+                } else {
+                    $('#opinions-visibility-btn').html('Density plot not refreshed <span class="glyphicon glyphicon-play"></span>');
+                }
+            }
             function refresh() {
                 if (iteration < opinionsTs.length) {
-                    plotOpinions(opinionsTs[iteration][0], opinionsTs[iteration][1]);
                     Plotly.redraw(document.getElementById('plot-indicators'));
+                    if (densityPlotUpdate > 0) {
+                        var start = new Date().getTime();
+                        plotOpinions(opinionsTs[iteration][0], opinionsTs[iteration][1], iteration);
+                        var time = new Date().getTime() - start;
+                        if (densityPlotUpdate === 1 && time > 100) {
+                            console.log("too slow");
+                            $('#opinions-visibility-btn').button('toggle');
+                            toggleDensityPlotUpdate();
+                        }
+                    }
                 }
             }
             function refreshLoop() {
@@ -266,8 +295,8 @@
                                 parseFloat($('#pe').val(), 10),
                                 parseFloat($('#egoInvolvedPart').val(), 10),
                                 [parseFloat($('#mu0').val(), 10), parseFloat($('#mu1').val(), 10)],
-                                [parseFloat($('#valBaseIncert0').val(), 10), parseFloat($('#valBaseIncert1').val(), 10)],
-                                parseInt($('#typeRencontre').val(), 10)
+                                [parseFloat($('#valBaseIncert0').val(), 10), parseFloat($('#valBaseIncert1').val(), 10)]
+                                //parseInt($('#typeRencontre').val(), 10)
                                 );
                         var x = new Array(pop.parameters.taille);
                         var y = new Array(pop.parameters.taille);
@@ -310,13 +339,7 @@
                 stopBtn.prop('disabled', !stop);
             }
             // Controls events
-            /*$('#typeRencontre').on('change', function () {
-             alert('Hop hop hop, pas trop vite.\n'
-             + 'On va attendre un peu pour tester les autres !\n\n'
-             + 'Allez, on reste sur la méthode par défaut\n');
-             $('#typeRencontre').val(4);
-             });*/
-            playBtn.click(function () {
+            function play() {
                 $('#config input').prop("disabled", true);
                 $('#config select').prop("disabled", true);
                 $('#tabs a[href="#plots"]').tab('show');
@@ -327,11 +350,15 @@
                 itSliderMax.text(stopIteration);
                 setTimeout(simulation, 0);
                 setTimeout(refreshLoop, 0);
-            });
+            }
+            // TODO scroll down with buttons on top on play
+            playBtn.click(play);
             pauseBtn.click(function () {
                 simulationRun = false;
                 setButtonsStates(true, false, true);
             });
+            // TODO call pause when stop clicked
+            // TODO call play when stop is canceled
             $('#stop-confirmed').click(function () {
                 initSimulation();
                 $('#config input').prop("disabled", false);
@@ -352,8 +379,11 @@
                     itSlider.val(iteration);
                 } else {
                     itSliderVal.text(this.value);
-                    plotOpinions(opinionsTs[this.value][0], opinionsTs[this.value][1]);
+                    plotOpinions(opinionsTs[this.value][0], opinionsTs[this.value][1], this.value);
                 }
+            });
+            $('#opinions-visibility-btn').on('click', function () {
+                toggleDensityPlotUpdate();
             });
             // Ok, we're ready
             initSimulation();
