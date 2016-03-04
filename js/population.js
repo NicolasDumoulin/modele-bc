@@ -120,8 +120,11 @@ Population.prototype.getClusters = function (epsilon) {
     return clusters;
 };
 
+/**
+ * Returns the polarized opinions average.
+ */
 Population.prototype.getOpAvg = function (subj) {
-    return this.population.reduce((prev, cur) => prev + cur.sBavg[0][subj], 0) / this.population.length;
+    return this.population.reduce((prev, cur) => prev + Math.abs(cur.sBavg[0][subj]), 0) / this.population.length;
 };
 
 Population.prototype.iter = function (iteration) {
