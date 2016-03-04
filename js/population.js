@@ -21,8 +21,11 @@ function randomNextDouble(max) {
 }
 
 function Individual(parameters) {
-// NB : scale est le nombre de valeurs entieres que peut prendre une subjective belief
-    this.poids = [0.5, 0.9];
+    if (randomNextDouble() < parameters.egoInvolvedPart) {
+        this.poids = [0.5, 0.9];
+    } else {
+        this.poids = [0.0, 0.0];
+    }
     this.nSb = parameters.nbSubjBelief;
     //for (var i=0; i<parameters.mu.length;i++) 
     this.mu = parameters.mu; // / parameters.muDiv;
@@ -52,9 +55,12 @@ function range(n) {
     });
 }
 
-function Population(popSize, pe, mu, valBaseIncert, type) {
+
+function Population(popSize, pe, egoInvolvedPart, mu, valBaseIncert, type) {
+    if (egoInvolvedPart===0) { type=1;} else {type=4;}
     this.parameters = {"nbReplicats": 1, "nbStep": 100000, "taille": popSize,
         "partExtremist": pe,
+        "highlyEngaged": egoInvolvedPart,
         "scale": 3, "nbObjetsConnus": 1, "nbSubjBelief": 2,
         "mu": mu,
         "muDiv": [1.0, 1.0],
@@ -80,19 +86,19 @@ function Population(popSize, pe, mu, valBaseIncert, type) {
         for (var z = 0; z < this.parameters.nbObjetsConnus; z++) {
             for (var j = 0; j < this.parameters.nbSubjBelief; j++) {
                 this.population[i].sBavg[z][j] = randomNextDouble(2) - 1;
-                this.population[i].sBavgInit[z][j] = randomNextDouble(2) - 1;
+                //this.population[i].sBavgInit[z][j] = randomNextDouble(2) - 1;
                 this.population[i].sBunc[z][j] = this.parameters.valBaseIncert[j];
             }
         }
         // initialization of extremist
-        if (i < this.parameters.taille * this.parameters.partExtremist / 2) {
+            if (i < this.parameters.taille * this.parameters.partExtremist / 2) {
             // first side
             this.population[i].setExtremist(1.0);
-        } else if (i < this.parameters.taille * this.parameters.partExtremist) {
+            } else if (i < this.parameters.taille * this.parameters.partExtremist) {
             // second side
             this.population[i].setExtremist(-1.0);
+            }
         }
-    }
     this.nbRejet = 0;
     this.nbAttraction = 0;
     this.distRejet = 0.0;
@@ -132,8 +138,6 @@ Population.prototype.iter = function (iteration) {
 // 0 modèle PBC de Jean-Denis Mathias
 // 3 (AR avec rejet non hiérarchisé possible sur toutes les dimensions), 
 // 4 (AR rejet sur seule dimension secondaire dynamique piloté par main dimension sur dimensions hiérarchisée)
-// 5 (AR rejet sans hiérarchie basé sur le relative agreement model - fait évoluer l'incertitude)
-// 6 (AR rejet hiérarchisé avec évolution incertitude (rejet et incertitude évolue de façon inverse sur dimension différente)
 
     var type = this.parameters.typeRencontre;
     var temp = range(this.parameters.taille);
@@ -177,22 +181,6 @@ Population.prototype.iter = function (iteration) {
                 mouvIndivJ = this.discussionMouvARHierarchise(this.population[i], this.population[j], 0); //ARWood
                 mouvIndivI = this.discussionMouvARHierarchise(this.population[j], this.population[i], 0); //ARWood
                 break;
-            case 5:
-                var result = this.discussionMouvARNonHierUncEvolve(this.population[i], this.population[j], 0); //relative agreement Deffuant et al JASSS 2002
-                mouvIndivJ = result[0];
-                mouvIncertJ = result[1];
-                var result = this.discussionMouvARNonHierUncEvolve(this.population[j], this.population[i], 0); //relative agreement Deffuant et al JASSS 2002
-                mouvIndivI = result[0];
-                mouvIncertI = result[1];
-                break;
-            case 6:
-                var result = this.discussionMouvAREtUncHierarchise(this.population[i], this.population[j], 0); //relative agreement Deffuant et al JASSS 2002
-                mouvIndivJ = result[0];
-                mouvIncertJ = result[1];
-                var result = this.discussionMouvAREtUncHierarchise(this.population[j], this.population[i], 0); //relative agreement Deffuant et al JASSS 2002
-                mouvIndivI = result[0];
-                mouvIncertI = result[1];
-                break;
         }
         if (mouvIndivJ[0] !== 0.0) {
             this.population[j].sBavg[0][0] = this.population[j].sBavg[0][0] + mouvIndivJ[0];
@@ -206,12 +194,6 @@ Population.prototype.iter = function (iteration) {
                 this.population[j].sBunc[0][1] = this.population[j].sBunc[0][1] + mouvIncertJ[1];
             }
         }
-        /*if (type === 4) {
-         this.population[j].sBunc[0][0] = this.population[j].sBunc[0][0] + mouvIncertJ[0];
-         this.population[j].sBunc[0][1] = this.population[j].sBunc[0][1] + mouvIncertJ[1];
-         this.population[i].sBunc[0][0] = this.population[i].sBunc[0][0] + mouvIncertI[0];
-         this.population[i].sBunc[0][1] = this.population[i].sBunc[0][1] + mouvIncertI[1];
-         }*/
         if (mouvIndivI[0] !== 0.0) {
             this.population[i].sBavg[0][0] = this.population[i].sBavg[0][0] + mouvIndivI[0];
             if (type === 2 || type === 5 || type === 6 || type === 3) {
@@ -375,7 +357,7 @@ Population.prototype.discussionMouvARHierarchise = function (a, b, objet) {
         }
     } // ou est si loin loin alors rien
     if (selfRelevancePos === selfRelevanceNeg) { // nothing is more important than other
-        mouvAvgDim = discussionMouvBC2DSimple(a, b, objet);
+        mouvAvgDim = this.discussionMouvBC2DSimple(a, b, objet);
     } else if (selfRelevancePos > selfRelevanceNeg) { // The individual defines itself positively in regards to A
         // Attraction on every dimensions
         for (i = 0; i < this.parameters.nbSubjBelief; i++) {
@@ -464,108 +446,6 @@ Population.prototype.discussionMouvARNonHierarchise = function (a, b, objet) {
                 }
             }
         }
-    }
-    return [mouvAvgDim, mouvUncDim];
-};
-/**
- * Méthode de discussion et d'influence entre les objets dont les valeurs de
- * subjective belief sont proches pour une rencontre entre deux individus,
- * influence directionnelle a influence b Méthode Huet et Deffuant 2007
- * Théorie du Jugement Social (attirance ou rejet de l'autre) ACS Paper
- * March 2008 - basé non plus sur le bc pour l'attraction mais sur le
- * relative agreement model (Deffuant et al JASSS 2002)
- */
-Population.prototype.discussionMouvARNonHierUncEvolve = function (a, b, objet) {
-    var mouvAvgDim = arrayFilled(this.parameters.nbSubjBelief, 0.0);
-    var mouvUncDim = arrayFilled(this.parameters.nbSubjBelief, 0.0);
-    // Interaction mode: 1 means increase closeness; -1 means rejection (increase farness)
-    var distInter = arrayFilled(this.parameters.nbSubjBelief, 0.0); // distance réel inter individus
-    for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
-        distInter[i] = Math.min((a.sBavg[objet][i] + a.sBunc[objet][i]), (b.sBavg[objet][i] + b.sBunc[objet][i]))
-                - Math.max((a.sBavg[objet][i] - a.sBunc[objet][i]), (b.sBavg[objet][i] - b.sBunc[objet][i])); // calcul de hij (overlap) - voir Deffuant, Amblard, Weisbuch, Faure, JASSS 2002
-    }
-    var modeInteract = (distInter[1] * distInter[0] > 0.0);
-    var attract = [0, 0];
-    for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
-        var agreement = (distInter[i] / a.sBunc[objet][i]) - 1;
-        if (modeInteract && distInter[i] > a.sBunc[objet][i]) { // rapprochement
-            mouvAvgDim[i] = (b.mu[i] * agreement * (a.sBavg[objet][i] - b.sBavg[objet][i]));
-            mouvUncDim[i] = -(Math.abs(mouvAvgDim[i]) / 2); // divisé par deux car uncertitude évolue dans un espace deux fois plus petit que attitude
-            attract[i] = 1;
-        } else { // rejet, éloignement
-            if (distInter[i] > 0 && distInter[i] > a.sBunc[objet][i]) {
-                // if far enough then rejection (devrait être fonction du désagrément (1 - l'agrément)
-                // Rejet sur dimension où u plus faible 
-                mouvAvgDim[i] = -(b.mu[i] * agreement * (a.sBavg[objet][i] - b.sBavg[objet][i]));
-                // Augmentation incertitude sur dimension où u plus large
-                mouvUncDim[i] = (Math.abs(mouvAvgDim[i]) / 2);
-            }
-        }
-    }
-    var situation = attract[0] + attract[1];
-    // si situation = 2 accord total ==> renforcement, u décroit sur les deux dimensions
-    // si situation = 1 dissonance ==> u croit sur dimension de proximité
-    // si situation = 0 désaccord total ==> u ne fait rien car organisation en groupe d'op impossible si u diminue ici
-    if (situation === 2) {
-        for (i = 0; i < this.parameters.nbSubjBelief; i++) {
-            var agreement = (distInter[i] / a.sBunc[objet][i]) - 1;
-            //mouvUncDim[i] = (b.mu[i] * agreement * (a.sBunc[objet][i] - b.sBunc[objet][i])); // ne change que si u diffère à temps 0 car différence entre u
-        }
-    } else if (situation === 1) {
-        for (i = 0; i < this.parameters.nbSubjBelief; i++) {
-            if (distInter[i] > 0 && distInter[i] > a.sBunc[objet][i]) {
-                //mouvUncDim[i] = -(b.mu[i] * (a.sBunc[objet][i] - b.sBunc[objet][i])); 
-            }
-        }
-    }
-    return [mouvAvgDim, mouvUncDim];
-};
-/**
- * Method computing the mouvement of opinion during a discussion between a
- * and b based on Wood et al 1996
- */
-Population.prototype.discussionMouvAREtUncHierarchise = function (a, b, objet) {
-    var seuilSelfRelevance = 0.05;
-    var mouvAvgDim = arrayFilled(this.parameters.nbSubjBelief, 0.0);
-    var mouvUncDim = arrayFilled(this.parameters.nbSubjBelief, 0.0);
-    // Interaction mode: 1 means increase closeness; -1 means rejection (increase farness)
-    var dist = arrayFilled(this.parameters.nbSubjBelief, 0.0);
-    for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
-        dist[i] = -(Math.abs(a.sBavg[objet][i] - b.sBavg[objet][i]) - b.sBunc[objet][i]);
-    }
-    // decision sur dim relevance pour déterminer type d'influence
-    var min = Math.min(b.sBunc[objet][0], b.sBunc[objet][1]);
-    // dire highly self relevant selon .... (sur cette version la plus infime différence initiale entre u0 et u1 suffit à différencier les dimensions dès le départ
-    var max = Math.max(b.sBunc[objet][0], b.sBunc[objet][1]);
-    var dimRelevance = 1;
-    if ((max - min) > seuilSelfRelevance) {
-        if (b.sBunc[objet][0] === min) {
-            dimRelevance = 0;
-        }
-        var agreement = [0, 0];
-        for (var z = 0; z < 2; z++) {
-            agreement[z] = Math.min((a.sBavg[objet][z] + a.sBunc[objet][z]), (b.sBavg[objet][z] + b.sBunc[objet][z])) - Math.max((a.sBavg[objet][z] - a.sBunc[objet][z]), (b.sBavg[objet][z] - b.sBunc[objet][z]));
-        }
-        if (dist[dimRelevance] >= 0) { // proche sur dim self relevance
-            if (dist[1 - dimRelevance] < 0) { // si loin sur dim non relevant
-                //Accroissement de l'incertitude sur seconde dimension pour mettre l'individu en situation d'être attiré à la prochaine recontre
-                mouvAvgDim[1 - dimRelevance] = this.attractionWithoutConditionMouv(a, b, objet, (1 - dimRelevance));
-            } else { // si près sur dim non relevant
-                var result = this.discussionMouvRelativAgreement(a, b, objet);
-                mouvAvgDim = result[0];
-                mouvUncDim = result[1];
-            }
-        } else // loin sur dim self relevance
-        if (dist[1 - dimRelevance] >= 0) { // proche sur seconde dimension
-            // rejet sur dimension de proximité secondaire et/ou accroissement de l'incertitude sur dimension main d'éloignement (ie de différenciation) => moins des différences
-            mouvAvgDim[1 - dimRelevance] = -(Math.abs(b.sBunc[objet][1 - dimRelevance] - b.sBunc[objet][dimRelevance])) * this.influenceAvg(a, b, objet, (1 - dimRelevance)); // ampleur du rejet est fonction de l'éloignement et de la différence de certitude
-            mouvUncDim[1 - dimRelevance] = -(b.mu[1 - dimRelevance] / 10 * ((agreement[1 - dimRelevance] / a.sBunc[objet][1 - dimRelevance]) - 1) * (b.sBunc[objet][1 - dimRelevance]));
-            mouvUncDim[dimRelevance] = (b.mu[dimRelevance] / 10 * ((agreement[1 - dimRelevance] / a.sBunc[objet][dimRelevance]) - 1) * (b.sBunc[objet][dimRelevance]));
-        } // else loin sur seconde dimension Nothing occcurs
-    } else {
-        var result = this.discussionMouvRelativAgreement(a, b, objet);
-        mouvAvgDim = result[0];
-        mouvUncDim = result[1];
     }
     return [mouvAvgDim, mouvUncDim];
 };

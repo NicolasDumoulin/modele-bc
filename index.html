@@ -36,25 +36,25 @@
                 </div>
             </div-->
             <div>
-                <form class="form-inline">
-                    <div class="form-group">
+            <form class="form-inline">
+                <div class="form-group">
                         <div class="input-group col-sm-4">
-                            <span class="input-group-addon">Nb steps to run</span>
-                            <input type="number" class="form-control" id="nbSteps" value="100">
-                        </div>
-                        <div class="btn-group">
-                            <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
-                            <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
-                            <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
-                        </div>
+                        <span class="input-group-addon">Nb steps to run</span>
+                        <input type="number" class="form-control" id="nbSteps" value="100">
                     </div>
-                </form>
-                <div class="input-group">
-                    <span class="input-group-addon">Iteration</span>
-                    <span class="input-group-addon" id="iterationSlider-val">0</span>
-                    <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
-                    <span class="input-group-addon" id="iterationSlider-max">100</span>
+                    <div class="btn-group">
+                        <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
+                        <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
+                        <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
+                    </div>
                 </div>
+            </form>
+            <div class="input-group">
+                <span class="input-group-addon">Iteration</span>
+                <span class="input-group-addon" id="iterationSlider-val">0</span>
+                <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
+                <span class="input-group-addon" id="iterationSlider-max">100</span>
+            </div>
             </div>
             <!-- Nav tabs -->
             <ul id="tabs" class="nav nav-tabs" role="tablist">
@@ -73,47 +73,41 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="pe"  class="col-sm-4">Part of extremist</label>
+                            <label for="pe"  class="col-sm-4">Part of extremist on each dimension</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="pe" value="0.0" step="0.1" min="0" max="1">
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label for="egoInvolvedPart"  class="col-sm-4">Part of highly self-engaged in dimension 1</label>
                             <div class="col-sm-4">
                                 <input type="number" class="form-control" id="pe" value="0.0" step="0.1" min="0" max="1">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="mu0"  class="col-sm-4">mu 1</label>
+                            <label for="mu0"  class="col-sm-4">mu dimension 1</label>
                             <div class="col-sm-4">
                                 <input type="number" class="form-control" id="mu0" value="0.5" step="0.1" min="0" max="1">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="mu1"  class="col-sm-4">mu 2</label>
+                            <label for="mu1"  class="col-sm-4">mu dimension 2</label>
                             <div class="col-sm-4">
                                 <input type="number" class="form-control" id="mu1" value="0.5" step="0.1" min="0" max="1">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="valBaseIncert0"  class="col-sm-4">val base incert 1</label>
+                            <label for="valBaseIncert0"  class="col-sm-4">uncertainty on dimension 1</label>
                             <div class="col-sm-4">
                                 <input type="number" class="form-control" id="valBaseIncert0" value="0.3" step="0.1" min="0" max="1">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="valBaseIncert1"  class="col-sm-4">val base incert 2</label>
+                            <label for="valBaseIncert1"  class="col-sm-4">uncertainty on dimension 2</label>
                             <div class="col-sm-4">
                                 <input type="number" class="form-control" id="valBaseIncert1" value="0.1" step="0.1" min="0" max="1">
                             </div>
                         </div>
-                        <!--div class="form-group">
-                            <label for="partCertains0"  class="col-sm-4">part certains 1</label>
-                            <div class="col-sm-4">
-                                <input type="number" class="form-control" id="partCertains0" value="0.0" step="0.1" min="0" max="1">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="partCertains1"  class="col-sm-4">part certains 2</label>
-                            <div class="col-sm-4">
-                                <input type="number" class="form-control" id="partCertains1" value="0.0" step="0.1" min="0" max="1">
-                            </div>
-                        </div-->
                         <div class="form-group">
                             <label for="typeRencontre"  class="col-sm-4">Type rencontre</label>
                             <div class="col-sm-4">
@@ -123,8 +117,6 @@
                                     <option value="2">Relative Agreement</option>
                                     <option value="3">MouvARNonHierarchise</option>
                                     <option value="4" selected="selected">MouvARHierarchise</option>
-                                    <option value="5">MouvARNonHierUncEvolve</option>
-                                    <option value="6">MouvAREtUncHierarchise</option>
                                 </select>
                             </div>
                         </div>
@@ -139,37 +131,37 @@
         <script type="text/javascript">
             function plotOpinions(x, y) {
                 var data = [{
-                        x: x,
-                        y: y,
-                        mode: 'markers',
-                        name: 'points',
-                        marker: {
-                            color: 'rgb(102,0,0)',
-                            size: 2,
-                            opacity: 0.4
-                        },
-                        type: 'scatter'
+                    x: x,
+                    y: y,
+                    mode: 'markers',
+                    name: 'points',
+                    marker: {
+                        color: 'rgb(102,0,0)',
+                        size: 2,
+                        opacity: 0.4
+                    },
+                    type: 'scatter'
                     }, {
-                        x: x,
-                        y: y,
-                        name: 'density',
-                        ncontours: 20,
-                        colorscale: 'Hot',
-                        reversescale: true,
-                        showscale: true,
-                        type: 'histogram2dcontour'
+                    x: x,
+                    y: y,
+                    name: 'density',
+                    ncontours: 20,
+                    colorscale: 'Hot',
+                    reversescale: true,
+                    showscale: true,
+                    type: 'histogram2dcontour'
                     }, {
-                        x: x,
+                    x: x,
                         name: 'opinion 1 density',
-                        marker: {color: 'rgb(102,0,0)'},
-                        yaxis: 'y2',
-                        type: 'histogram'
+                    marker: {color: 'rgb(102,0,0)'},
+                    yaxis: 'y2',
+                    type: 'histogram'
                     }, {
-                        y: y,
+                    y: y,
                         name: 'opinion 2 density',
-                        marker: {color: 'rgb(102,0,0)'},
-                        xaxis: 'x2',
-                        type: 'histogram'
+                    marker: {color: 'rgb(102,0,0)'},
+                    xaxis: 'x2',
+                    type: 'histogram'
                     }];
                 var opinionAxis = {
                     range: [-1, 1],
@@ -272,6 +264,7 @@
                         pop = new Population(
                                 parseInt($('#popSizeInput').val(), 10),
                                 parseFloat($('#pe').val(), 10),
+                                parseFloat($('#egoInvolvedPart').val(), 10),
                                 [parseFloat($('#mu0').val(), 10), parseFloat($('#mu1').val(), 10)],
                                 [parseFloat($('#valBaseIncert0').val(), 10), parseFloat($('#valBaseIncert1').val(), 10)],
                                 parseInt($('#typeRencontre').val(), 10)
