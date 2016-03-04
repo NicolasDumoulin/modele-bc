@@ -196,37 +196,23 @@
                 return [p, x, y];
             }
             function plotIndicators(indicatorsTs) {
-                var trace1 = {
-                    name: 'nb clusters',
-                    x: indicatorsRange,
-                    y: indicatorsTs.nbClusters,
-                    type: 'scatter'
-                };
                 var trace2 = {
                     name: 'opinion 1',
                     x: indicatorsRange,
                     y: indicatorsTs.opAvg0,
-                    yaxis: 'y2',
                     type: 'scatter'
                 };
                 var trace3 = {
                     name: 'opinion 2',
                     x: indicatorsRange,
                     y: indicatorsTs.opAvg1,
-                    yaxis: 'y2',
                     type: 'scatter'
                 };
-                var data = [trace1, trace2, trace3];
-                Plotly.newPlot('plot-indicators', data, {width: 600, height: 550, yaxis: {title: 'nb clusters'},
-                    yaxis2: {
-                        title: 'opinions polarization',
-                        range: [0, 1],
-                        overlaying: 'y',
-                        side: 'right'
-                    }});
+                var data = [trace2, trace3];
+                Plotly.newPlot('plot-indicators', data, {title:'Opinions polarization', width: 600, height: 550, yaxis: {title: 'opinions mean (absolute values)',range: [0, 1]}});
             }
             function updatePlotIndicators() {
-                indicatorsTs.nbClusters.push(pop.getClusters(0.01).length);
+                //indicatorsTs.nbClusters.push(pop.getClusters(0.01).length);
                 indicatorsTs.opAvg0.push(pop.getOpAvg(0));
                 indicatorsTs.opAvg1.push(pop.getOpAvg(1));
                 indicatorsRange.push(iteration);
