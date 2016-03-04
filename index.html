@@ -234,6 +234,7 @@
             var simulationRun = true;
             var densityPlotUpdate = 1;
             var stopIteration = 0;
+            var paused = false;
             var iteration = 0;
             var pop;
             var opinionsTs = []; // opinions time series
@@ -244,6 +245,7 @@
                 $('#plot-indicators').empty();
                 opinionsTs = [];
                 indicatorsRange = [];
+                densityPlotUpdate = 1;
                 simulationRun = false;
                 iteration = 0;
                 stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
@@ -275,6 +277,7 @@
                         var time = new Date().getTime() - start;
                         if (densityPlotUpdate === 1 && time > 100) {
                             console.log("too slow");
+                            // TODO show message
                             $('#opinions-visibility-btn').button('toggle');
                             toggleDensityPlotUpdate();
                         }
@@ -345,20 +348,25 @@
                 $('#tabs a[href="#plots"]').tab('show');
                 simulationRun = true;
                 setButtonsStates(false, true, true);
-                stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
-                itSlider.attr('max', stopIteration);
-                itSliderMax.text(stopIteration);
+                if (!paused) {
+                    stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
+                    itSlider.attr('max', stopIteration);
+                    itSliderMax.text(stopIteration);
+                } else {
+                    paused = false;
+                }
                 setTimeout(simulation, 0);
                 setTimeout(refreshLoop, 0);
             }
+            function pause() {
+                simulationRun = false;
+                paused = true;
+                setButtonsStates(true, false, true);
+            }
             // TODO scroll down with buttons on top on play
             playBtn.click(play);
-            pauseBtn.click(function () {
-                simulationRun = false;
-                setButtonsStates(true, false, true);
-            });
-            // TODO call pause when stop clicked
-            // TODO call play when stop is canceled
+            pauseBtn.click(pause);
+            stopBtn.click(pause);
             $('#stop-confirmed').click(function () {
                 initSimulation();
                 $('#config input').prop("disabled", false);
