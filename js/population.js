@@ -31,6 +31,27 @@ function Individual(parameters) {
     this.sBunc = matrix(parameters.nbObjetsConnus, this.nSb, 0.0);
 }
 
+Individual.prototype.isExtremist = function () {
+    return this.sBunc[0][0] === 0.0001;
+};
+Individual.prototype.setExtremist = function (opinion) {
+    this.sBavg[0][0] = opinion;
+    this.sBunc[0][0] === 0.0001;
+};
+Individual.prototype.distance = function (indiv) {
+    var distance = 0;
+    for (var obj = 0; obj < this.nSb; obj++) {
+        distance += Math.pow(this.sBavg[0][obj] - indiv.sBavg[0][obj], 2);
+    }
+    return distance;
+};
+
+function range(n) {
+    return Array.apply(null, Array(n)).map(function (_, i) {
+        return i;
+    });
+}
+
 function Population(popSize, pe, mu, valBaseIncert, type) {
     this.parameters = {"nbReplicats": 1, "nbStep": 100000, "taille": popSize,
         "partExtremist": pe,
@@ -65,16 +86,13 @@ function Population(popSize, pe, mu, valBaseIncert, type) {
         }
         // initialization of extremist
         if (i < this.parameters.taille * this.parameters.partExtremist / 2) {
-        // first side
-            this.population[i].sBavg[0][0] = 1.0;
-            this.population[i].sBunc[0][0] = 0.0001;
+            // first side
+            this.population[i].setExtremist(1.0);
         } else if (i < this.parameters.taille * this.parameters.partExtremist) {
             // second side
-            this.population[i].sBavg[0][0] = -1.0;
-            this.population[i].sBunc[0][0] = 0.0001;
+            this.population[i].setExtremist(-1.0);
         }
     }
-
     this.nbRejet = 0;
     this.nbAttraction = 0;
     this.distRejet = 0.0;
@@ -82,6 +100,29 @@ function Population(popSize, pe, mu, valBaseIncert, type) {
     this.distRejetConfine = 0.0;
     this.distAttractionConfine = 0.0;
 }
+
+Population.prototype.getClusters = function (epsilon) {
+    // gathering index of moderate individuals
+    var self = this;
+    var todo = range(this.parameters.taille).filter(function (indIndex) {
+        return !self.population[indIndex].isExtremist();
+    });
+    var clusters = [];
+    while (todo.length > 0) {
+        var currentCluster = [this.population[todo.pop()]];
+        range(todo.length).filter(function (indIndex) {
+            return currentCluster[0].distance(self.population[todo[indIndex]]) < epsilon;
+        }).forEach(function (indIndex) {
+            currentCluster.push(self.population[todo.splice(indIndex, 1)[0]]);
+        });
+        clusters.push(currentCluster);
+    }
+    return clusters;
+};
+
+Population.prototype.getOpAvg = function (subj) {
+    return this.population.reduce((prev, cur) => prev + cur.sBavg[0][subj], 0) / this.population.length;
+};
 
 Population.prototype.iter = function (iteration) {
 // Type de rencontre typ = 1 (BC Simple), 2 (Relative Agreement), 
@@ -92,10 +133,7 @@ Population.prototype.iter = function (iteration) {
 // 6 (AR rejet hiérarchisé avec évolution incertitude (rejet et incertitude évolue de façon inverse sur dimension différente)
 
     var type = this.parameters.typeRencontre;
-    // generating a range from 0 to taille -1
-    var temp = Array.apply(null, Array(this.parameters.taille)).map(function (_, i) {
-        return i;
-    });
+    var temp = range(this.parameters.taille);
     // shuffling
     for (var j, x, i = temp.length; i; j = Math.floor(Math.random() * i), x = temp[--i], temp[i] = temp[j], temp[j] = x)
         ;
