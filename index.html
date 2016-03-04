@@ -36,25 +36,25 @@
                 </div>
             </div-->
             <div>
-            <form class="form-inline">
-                <div class="form-group">
+                <form class="form-inline">
+                    <div class="form-group">
                         <div class="input-group col-sm-4">
-                        <span class="input-group-addon">Nb steps to run</span>
-                        <input type="number" class="form-control" id="nbSteps" value="100">
+                            <span class="input-group-addon">Nb steps to run</span>
+                            <input type="number" class="form-control" id="nbSteps" value="100">
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
+                            <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
+                            <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
+                        </div>
                     </div>
-                    <div class="btn-group">
-                        <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
-                        <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
-                        <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
-                    </div>
+                </form>
+                <div class="input-group">
+                    <span class="input-group-addon">Iteration</span>
+                    <span class="input-group-addon" id="iterationSlider-val">0</span>
+                    <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
+                    <span class="input-group-addon" id="iterationSlider-max">100</span>
                 </div>
-            </form>
-            <div class="input-group">
-                <span class="input-group-addon">Iteration</span>
-                <span class="input-group-addon" id="iterationSlider-val">0</span>
-                <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
-                <span class="input-group-addon" id="iterationSlider-max">100</span>
-            </div>
             </div>
             <!-- Nav tabs -->
             <ul id="tabs" class="nav nav-tabs" role="tablist">
@@ -78,7 +78,7 @@
                                 <input type="number" class="form-control" id="pe" value="0.0" step="0.1" min="0" max="1">
                             </div>
                         </div>
-                         <div class="form-group">
+                        <div class="form-group">
                             <label for="egoInvolvedPart"  class="col-sm-4">Part of highly self-engaged in dimension 1</label>
                             <div class="col-sm-4">
                                 <input type="number" class="form-control" id="pe" value="0.0" step="0.1" min="0" max="1">
@@ -131,37 +131,37 @@
         <script type="text/javascript">
             function plotOpinions(x, y) {
                 var data = [{
-                    x: x,
-                    y: y,
-                    mode: 'markers',
-                    name: 'points',
-                    marker: {
-                        color: 'rgb(102,0,0)',
-                        size: 2,
-                        opacity: 0.4
-                    },
-                    type: 'scatter'
+                        x: x,
+                        y: y,
+                        mode: 'markers',
+                        name: 'points',
+                        marker: {
+                            color: 'rgb(102,0,0)',
+                            size: 2,
+                            opacity: 0.4
+                        },
+                        type: 'scatter'
                     }, {
-                    x: x,
-                    y: y,
-                    name: 'density',
-                    ncontours: 20,
-                    colorscale: 'Hot',
-                    reversescale: true,
-                    showscale: true,
-                    type: 'histogram2dcontour'
+                        x: x,
+                        y: y,
+                        name: 'density',
+                        ncontours: 20,
+                        colorscale: 'Hot',
+                        reversescale: true,
+                        showscale: true,
+                        type: 'histogram2dcontour'
                     }, {
-                    x: x,
+                        x: x,
                         name: 'opinion 1 density',
-                    marker: {color: 'rgb(102,0,0)'},
-                    yaxis: 'y2',
-                    type: 'histogram'
+                        marker: {color: 'rgb(102,0,0)'},
+                        yaxis: 'y2',
+                        type: 'histogram'
                     }, {
-                    y: y,
+                        y: y,
                         name: 'opinion 2 density',
-                    marker: {color: 'rgb(102,0,0)'},
-                    xaxis: 'x2',
-                    type: 'histogram'
+                        marker: {color: 'rgb(102,0,0)'},
+                        xaxis: 'x2',
+                        type: 'histogram'
                     }];
                 var opinionAxis = {
                     range: [-1, 1],

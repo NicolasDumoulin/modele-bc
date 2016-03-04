@@ -57,7 +57,11 @@ function range(n) {
 
 
 function Population(popSize, pe, egoInvolvedPart, mu, valBaseIncert, type) {
-    if (egoInvolvedPart===0) { type=1;} else {type=4;}
+    if (egoInvolvedPart === 0) {
+        type = 1;
+    } else {
+        type = 4;
+    }
     this.parameters = {"nbReplicats": 1, "nbStep": 100000, "taille": popSize,
         "partExtremist": pe,
         "highlyEngaged": egoInvolvedPart,
@@ -91,14 +95,14 @@ function Population(popSize, pe, egoInvolvedPart, mu, valBaseIncert, type) {
             }
         }
         // initialization of extremist
-            if (i < this.parameters.taille * this.parameters.partExtremist / 2) {
+        if (i < this.parameters.taille * this.parameters.partExtremist / 2) {
             // first side
             this.population[i].setExtremist(1.0);
-            } else if (i < this.parameters.taille * this.parameters.partExtremist) {
+        } else if (i < this.parameters.taille * this.parameters.partExtremist) {
             // second side
             this.population[i].setExtremist(-1.0);
-            }
         }
+    }
     this.nbRejet = 0;
     this.nbAttraction = 0;
     this.distRejet = 0.0;
