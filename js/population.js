@@ -34,13 +34,13 @@ function Individual(parameters) {
 }
 
 Individual.prototype.isExtremist = function () {
-    return this.sBunc[0][0] === 0.0001;
+    return this.sBunc[0][0] === 0.0;
 };
 Individual.prototype.setExtremist = function (opinion) {
     this.sBavg[0][0] = opinion;
-    this.sBunc[0][0] === 0.0001;
+    this.sBunc[0][0] = 0.0;
     this.sBavg[0][1] = opinion;
-    this.sBunc[0][1] === 0.0001;
+    this.sBunc[0][1] = 0.0;
 };
 Individual.prototype.distance = function (indiv) {
     var distance = 0;
