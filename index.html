@@ -59,7 +59,7 @@
             <!-- Nav tabs -->
             <ul id="tabs" class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#config" aria-controls="config" role="tab" data-toggle="tab">Config</a></li>
-                <li role="presentation"><a href="#plot" aria-controls="plot" role="tab" data-toggle="tab">Plot</a></li>
+                <li role="presentation"><a href="#plots" aria-controls="plots" role="tab" data-toggle="tab">Plots</a></li>
             </ul>
 
             <!-- Tab panes -->
@@ -130,51 +130,61 @@
                         </div>
                     </form>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="plot">
-                    <div id="plotly"></div>
+                <div role="tabpanel" class="tab-pane" id="plots">
+                    <div class="col-lg-6" id="plot-opinions"></div>
+                    <div class="col-lg-6" id="plot-indicators"></div>
                 </div>
             </div>
         </div>
         <script type="text/javascript">
-            function plot(x, y) {
-                var trace1 = {
-                    x: x,
-                    y: y,
-                    mode: 'markers',
-                    name: 'points',
-                    marker: {
-                        color: 'rgb(102,0,0)',
-                        size: 2,
-                        opacity: 0.4
-                    },
-                    type: 'scatter'
+            function plotOpinions(x, y) {
+                var data = [{
+                        x: x,
+                        y: y,
+                        mode: 'markers',
+                        name: 'points',
+                        marker: {
+                            color: 'rgb(102,0,0)',
+                            size: 2,
+                            opacity: 0.4
+                        },
+                        type: 'scatter'
+                    }, {
+                        x: x,
+                        y: y,
+                        name: 'density',
+                        ncontours: 20,
+                        colorscale: 'Hot',
+                        reversescale: true,
+                        showscale: true,
+                        type: 'histogram2dcontour'
+                    }, {
+                        x: x,
+                        name: 'opinion 1 density',
+                        marker: {color: 'rgb(102,0,0)'},
+                        yaxis: 'y2',
+                        type: 'histogram'
+                    }, {
+                        y: y,
+                        name: 'opinion 2 density',
+                        marker: {color: 'rgb(102,0,0)'},
+                        xaxis: 'x2',
+                        type: 'histogram'
+                    }];
+                var opinionAxis = {
+                    range: [-1, 1],
+                    autorange: false,
+                    domain: [0, 0.8],
+                    showgrid: false,
+                    zeroline: false
                 };
-                var trace2 = {
-                    x: x,
-                    y: y,
-                    name: 'density',
-                    ncontours: 20,
-                    colorscale: 'Hot',
-                    reversescale: true,
-                    showscale: true,
-                    type: 'histogram2dcontour'
+                var densitiAxis = {
+                    domain: [0.85, 1],
+                    showgrid: false,
+                    zeroline: false
                 };
-                var trace3 = {
-                    x: x,
-                    name: 'x density',
-                    marker: {color: 'rgb(102,0,0)'},
-                    yaxis: 'y2',
-                    type: 'histogram'
-                };
-                var trace4 = {
-                    y: y,
-                    name: 'y density',
-                    marker: {color: 'rgb(102,0,0)'},
-                    xaxis: 'x2',
-                    type: 'histogram'
-                };
-                var data = [trace1, trace2, trace3, trace4];
                 var layout = {
+                    title: 'Opinions densities',
                     showlegend: false,
                     autosize: false,
                     width: 600,
@@ -182,42 +192,59 @@
                     margin: {t: 50},
                     hovermode: 'closest',
                     bargap: 0,
-                    xaxis: {
-                        range: [-1, 1],
-                        autorange: false,
-                        domain: [0, 0.8],
-                        showgrid: false,
-                        zeroline: false
-                    },
-                    yaxis: {
-                        range: [-1, 1],
-                        autorange: false,
-                        domain: [0, 0.8],
-                        showgrid: false,
-                        zeroline: false
-                    },
-                    xaxis2: {
-                        domain: [0.85, 1],
-                        showgrid: false,
-                        zeroline: false
-                    },
-                    yaxis2: {
-                        domain: [0.85, 1],
-                        showgrid: false,
-                        zeroline: false
-                    }
+                    xaxis: $.extend({title: 'opinion 1'}, opinionAxis),
+                    yaxis: $.extend({title: 'opinion 2'}, opinionAxis),
+                    xaxis2: densitiAxis,
+                    yaxis2: densitiAxis
                 };
-                p = Plotly.newPlot('plotly', data, layout);
+                p = Plotly.newPlot('plot-opinions', data, layout);
                 return [p, x, y];
+            }
+            function plotIndicators(indicatorsTs) {
+                var trace1 = {
+                    name: 'nb clusters',
+                    x: indicatorsRange,
+                    y: indicatorsTs.nbClusters,
+                    type: 'scatter'
+                };
+                var trace2 = {
+                    name: 'opinion 1 avg',
+                    x: indicatorsRange,
+                    y: indicatorsTs.opAvg0,
+                    yaxis: 'y2',
+                    type: 'scatter'
+                };
+                var trace3 = {
+                    name: 'opinion 2 avg',
+                    x: indicatorsRange,
+                    y: indicatorsTs.opAvg1,
+                    yaxis: 'y2',
+                    type: 'scatter'
+                };
+                var data = [trace1, trace2, trace3];
+                Plotly.newPlot('plot-indicators', data, {width: 600, height: 550, yaxis: {title: 'nb clusters'},
+                    yaxis2: {
+                        title: 'opinions avg',
+                        overlaying: 'y',
+                        side: 'right'
+                    }});
+            }
+            function updatePlotIndicators() {
+                indicatorsTs.nbClusters.push(pop.getClusters(0.01).length);
+                indicatorsTs.opAvg0.push(pop.getOpAvg(0));
+                indicatorsTs.opAvg1.push(pop.getOpAvg(1));
+                indicatorsRange.push(iteration);
             }
             var simulationRun = true;
             var stopIteration = 0;
             var iteration = 0;
             var pop;
-            var results = [];
+            var opinionsTs = []; // opinions time series
+            var indicatorsRange = [];
+            var indicatorsTs = {nbClusters: [], opAvg0: [], opAvg1: []};
             function initSimulation() {
-                $('#plotly').empty();
-                results = [];
+                $('#plot-opinions').empty();
+                opinionsTs = [];
                 simulationRun = false;
                 iteration = 0;
                 stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
@@ -228,8 +255,9 @@
                 setButtonsStates(true, false, true);
             }
             function refresh() {
-                if (iteration < results.length) {
-                    plot(results[iteration][0], results[iteration][1]);
+                if (iteration < opinionsTs.length) {
+                    plotOpinions(opinionsTs[iteration][0], opinionsTs[iteration][1]);
+                    Plotly.redraw(document.getElementById('plot-indicators'));
                 }
             }
             function refreshLoop() {
@@ -240,7 +268,7 @@
             }
             function simulation() {
                 if (simulationRun) {
-                    if (results.length === 0) {
+                    if (opinionsTs.length === 0) {
                         pop = new Population(
                                 parseInt($('#popSizeInput').val(), 10),
                                 parseFloat($('#pe').val(), 10),
@@ -254,7 +282,9 @@
                             x.push(pop.population[i].sBavg[0][0]);
                             y.push(pop.population[i].sBavg[0][1]);
                         }
-                        results.push([x, y]);
+                        opinionsTs.push([x, y]);
+                        updatePlotIndicators();
+                        plotIndicators(indicatorsTs);
                         refresh();
                     }
                     iteration = iteration + 1;
@@ -265,7 +295,8 @@
                         x.push(pop.population[i].sBavg[0][0]);
                         y.push(pop.population[i].sBavg[0][1]);
                     }
-                    results.push([x, y]);
+                    opinionsTs.push([x, y]);
+                    updatePlotIndicators();
                     itSlider.val(iteration);
                     itSliderVal.text(iteration);
                     simulationRun = iteration < stopIteration;
@@ -295,7 +326,7 @@
             playBtn.click(function () {
                 $('#config input').prop("disabled", true);
                 $('#config select').prop("disabled", true);
-                $('#tabs a[href="#plot"]').tab('show');
+                $('#tabs a[href="#plots"]').tab('show');
                 simulationRun = true;
                 setButtonsStates(false, true, true);
                 stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
@@ -328,7 +359,7 @@
                     itSlider.val(iteration);
                 } else {
                     itSliderVal.text(this.value);
-                    plot(results[this.value][0], results[this.value][1]);
+                    plotOpinions(opinionsTs[this.value][0], opinionsTs[this.value][1]);
                 }
             });
             // Ok, we're ready
