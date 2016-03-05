@@ -26,11 +26,9 @@ function Individual(parameters) {
     } else {
         this.poids = [0.0, 0.0];
     }
-    this.nSb = parameters.nbSubjBelief;
     this.mu = parameters.mu;
-    this.sBavg = matrix(parameters.nbObjetsConnus, this.nSb, 0.0);
-    this.sBavgInit = matrix(parameters.nbObjetsConnus, this.nSb, 0.0);
-    this.sBunc = matrix(parameters.nbObjetsConnus, this.nSb, 0.0);
+    this.sBavg = matrix(parameters.nbObjetsConnus, parameters.nbSubjBelief, 0.0);
+    this.sBunc = matrix(parameters.nbObjetsConnus, parameters.nbSubjBelief, 0.0);
 }
 
 Individual.prototype.isExtremist = function () {
@@ -42,12 +40,11 @@ Individual.prototype.setExtremist = function (opinion) {
     this.sBavg[0][1] = opinion;
     this.sBunc[0][1] = 0.0;
 };
+Individual.distance = function(opA1, opA2, opB1, opB2) {
+    return Math.sqrt(Math.pow(opA1 - opB1, 2) + Math.pow(opA2 - opB2, 2));
+};
 Individual.prototype.distance = function (indiv) {
-    var distance = 0;
-    for (var obj = 0; obj < this.nSb; obj++) {
-        distance += Math.pow(this.sBavg[0][obj] - indiv.sBavg[0][obj], 2);
-    }
-    return Math.sqrt(distance);
+    return Individual.distance(this.sBavg[0][0],this.sBavg[0][1],indiv.sBavg[0][0],indiv.sBavg[0][1]);
 };
 
 function range(n) {
@@ -87,7 +84,6 @@ function Population(popSize, pe, egoInvolvedPart, mu, valBaseIncert, type) {
         for (var z = 0; z < this.parameters.nbObjetsConnus; z++) {
             for (var j = 0; j < this.parameters.nbSubjBelief; j++) {
                 this.population[i].sBavg[z][j] = randomNextDouble(2) - 1;
-                //this.population[i].sBavgInit[z][j] = randomNextDouble(2) - 1;
                 this.population[i].sBunc[z][j] = this.parameters.valBaseIncert[j];
             }
         }

@@ -37,25 +37,47 @@
             </div-->
             <div>
                 <form class="form-inline">
-                    <div class="form-group">
-                        <div class="input-group col-sm-4">
-                            <span class="input-group-addon">Nb steps to run</span>
-                            <input type="number" class="form-control" id="nbSteps" value="100">
-                        </div>
-                        <div class="btn-group">
-                            <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
-                            <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
-                            <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
-                        </div>
+                    <div class="input-group col-sm-4">
+                        <span class="input-group-addon">Nb steps to run</span>
+                        <input type="number" class="form-control" id="nbSteps" value="1000">
+                    </div>
+                    <div class="btn-group col-sm-4">
+                        <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
+                        <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
+                        <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
                     </div>
                 </form>
-                <div class="input-group">
-                    <span class="input-group-addon">Iteration</span>
-                    <span class="input-group-addon" id="iterationSlider-val">0</span>
-                    <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
-                    <span class="input-group-addon" id="iterationSlider-max">100</span>
-                </div>
             </div>
+            <div class="input-group col-sm-12">
+                <span class="input-group-addon">Iteration</span>
+                <span class="input-group-addon" id="iterationSlider-val">0</span>
+                <input id="iterationSlider" class="form-control" type="range" min="0" max="100" value="0"/>
+                <span class="input-group-addon" id="iterationSlider-max">500</span>
+            </div>
+            <form  id="plots-frequency">
+                <div class="input-group col-sm-6">
+                    <span class="input-group-addon" title="Sets the frequency of the computing and redrawing process for the plots.">
+                        Plots frequency
+                    </span>
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default active" title="Computes a frequency giving low-priority for plots">
+                            <input type="radio" name="options" value="auto" autocomplete="off" checked>Auto
+                        </label>
+                        <label class="btn btn-default" title="Every timestep">
+                            <input type="radio" name="options" value="1" autocomplete="off">1
+                        </label>
+                        <label class="btn btn-default" title="Every 10 timesteps">
+                            <input type="radio" name="options" value="10" autocomplete="off">10
+                        </label>
+                        <label class="btn btn-default" title="Every 100 timesteps">
+                            <input type="radio" name="options" value="100" autocomplete="off">100
+                        </label>
+                        <label class="btn btn-default" title="Disable the plots updating process">
+                            <input type="radio" name="options" value="off" autocomplete="off">Off
+                        </label>
+                    </div>
+                </div>
+            </form>
             <!-- Nav tabs -->
             <ul id="tabs" class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#config" aria-controls="config" role="tab" data-toggle="tab">Config</a></li>
@@ -68,7 +90,7 @@
                         <div class="form-group">
                             <label for="popSizeInput"  class="col-sm-4">Pop size</label>
                             <div class="col-sm-4">
-                                <input type="number" class="form-control" id="popSizeInput" value="500">
+                                <input type="number" class="form-control" id="popSizeInput" value="5000">
                             </div>
                         </div>
                         <div class="form-group">
@@ -122,10 +144,6 @@
                     </form>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="plots">
-                    <div class="col-lg-12">
-                        <button type="button" id="opinions-visibility-btn" class="btn btn-default" data-toggle="button" aria-pressed="false" autocomplete="off" title="Hiding the plot allow better simulation performance.">
-                            Hide density plot <span class="glyphicon glyphicon-pause"></span></button>
-                    </div>
                     <div class="col-lg-6" id="plot-opinions"></div>
                     <div class="col-lg-6" id="plot-indicators"></div>
                 </div>
@@ -195,45 +213,99 @@
                 p = Plotly.newPlot('plot-opinions', data, layout);
                 return [p, x, y];
             }
-            function plotIndicators(indicatorsTs) {
+            // TODO échelle de couleurs commence à 0,200 (cf. quand on démarre avec des extrémistes)
+            function initPlotIndicators(indicatorsTs) {
+                var trace1 = {
+                    name: 'nb clusters',
+                    x: indicatorsRange,
+                    y: indicatorsTs.nbClusters,
+                    type: 'scatter'
+                };
                 var trace2 = {
                     name: 'opinion 1',
                     x: indicatorsRange,
                     y: indicatorsTs.opAvg0,
+                    yaxis: 'y2',
                     type: 'scatter'
                 };
                 var trace3 = {
                     name: 'opinion 2',
                     x: indicatorsRange,
                     y: indicatorsTs.opAvg1,
+                    yaxis: 'y2',
                     type: 'scatter'
                 };
-                var data = [trace2, trace3];
-                Plotly.newPlot('plot-indicators', data, {title:'Opinions polarization', width: 600, height: 550, yaxis: {title: 'opinions mean (absolute values)',range: [0, 1]}});
+                var data = [trace1, trace2, trace3];
+                Plotly.newPlot('plot-indicators', data, {width: 600, height: 550, yaxis: {title: 'nb clusters', range: [0, 5000]},
+                    yaxis2: {
+                        title: 'opinions mean (absolute values)',
+                        range: [0, 1],
+                        overlaying: 'y',
+                        side: 'right'
+                    }});
             }
-            function updatePlotIndicators() {
-                //indicatorsTs.nbClusters.push(pop.getClusters(0.01).length);
-                indicatorsTs.opAvg0.push(pop.getOpAvg(0));
-                indicatorsTs.opAvg1.push(pop.getOpAvg(1));
-                indicatorsRange.push(iteration);
+            function updatePlotIndicators(timestep) {
+                // find where the data should be inserted in the timeseries
+                var insertionIndex = indicatorsRange.findIndex(function (x) {
+                    return x > timestep;
+                });
+                if (insertionIndex <0) {
+                    // no index greater, so we should append to the end
+                    insertionIndex=indicatorsRange.length;
+                }
+                indicatorsTs.nbClusters.splice(insertionIndex, 0, getClusters(timestep, 0.01).length);
+                indicatorsTs.opAvg0.splice(insertionIndex, 0, getOpAvg(timestep, 0));
+                indicatorsTs.opAvg1.splice(insertionIndex, 0, getOpAvg(timestep, 1));
+                indicatorsRange.splice(insertionIndex, 0, timestep);
+                plotsToRefresh = true;
+            }
+            function getOpAvg(timestep, subj) {
+                return opinionsTs[timestep][subj].reduce(function (prev, cur) {
+                    return prev + Math.abs(cur);
+                }, 0) / opinionsTs[timestep][subj].length;
+            }
+            function getClusters(timestep, epsilon) {
+                // gathering index of moderate individuals
+                var todo = range(opinionsTs[timestep][0].length).filter(function (indIndex) {
+                    return extremistId.indexOf(indIndex) < 0;
+                });
+                var opinions = opinionsTs[timestep];
+                var clusters = [];
+                while (todo.length > 0) {
+                    var currentIndex = todo.pop();
+                    var currentIndiv = [opinions[0][currentIndex], opinions[1][currentIndex]];
+                    var currentCluster = [currentIndiv];
+                    range(todo.length).filter(function (todoIndex) {
+                        return Individual.distance(currentIndiv[0], currentIndiv[1], opinions[0][todo[todoIndex]], opinions[1][todo[todoIndex]]) < epsilon;
+                    }).forEach(function (todoIndex) {
+                        var index = todo.splice(todoIndex, 1)[0];
+                        currentCluster.push([opinions[0][index], opinions[1][index]]);
+                    });
+                    clusters.push(currentCluster);
+                }
+                return clusters;
             }
             var simulationRun = true;
-            var densityPlotUpdate = 1;
             var stopIteration = 0;
             var paused = false;
             var iteration = 0;
             var pop;
             var opinionsTs = []; // opinions time series
+            var extremistId = []; // extremist IDs
             var indicatorsRange = [];
             var indicatorsTs = {nbClusters: [], opAvg0: [], opAvg1: []};
             function initSimulation() {
                 $('#plot-opinions').empty();
                 $('#plot-indicators').empty();
                 opinionsTs = [];
+                extremistId = [];
                 indicatorsRange = [];
-                densityPlotUpdate = 1;
                 simulationRun = false;
                 iteration = 0;
+                stepsDuration = 0;
+                plotDuration = -1;
+                nextPlotsTimestep = -1;
+                plotsToRefresh = false;
                 stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
                 itSlider.val(0);
                 itSliderVal.text('0');
@@ -241,40 +313,20 @@
                 itSliderMax.text(stopIteration);
                 setButtonsStates(true, false, true);
             }
-            function toggleDensityPlotUpdate() {
-                if (densityPlotUpdate === 0) {
-                    densityPlotUpdate = 2;
-                } else {
-                    densityPlotUpdate = !densityPlotUpdate + 0;
-                }
-                if (densityPlotUpdate) {
-                    $('#opinions-visibility-btn').html('Hide density plot <span class="glyphicon glyphicon-pause"></span>');
-                    plotOpinions(opinionsTs[iteration][0], opinionsTs[iteration][1], iteration);
-                } else {
-                    $('#opinions-visibility-btn').html('Density plot not refreshed <span class="glyphicon glyphicon-play"></span>');
-                }
+            function refresh(timestep) {
+                Plotly.redraw(document.getElementById('plot-indicators'));
+                plotOpinions(opinionsTs[timestep][0], opinionsTs[timestep][1], timestep);
             }
-            function refresh() {
-                if (iteration < opinionsTs.length) {
-                    Plotly.redraw(document.getElementById('plot-indicators'));
-                    if (densityPlotUpdate > 0) {
-                        var start = new Date().getTime();
-                        plotOpinions(opinionsTs[iteration][0], opinionsTs[iteration][1], iteration);
-                        var time = new Date().getTime() - start;
-                        if (densityPlotUpdate === 1 && time > 100) {
-                            console.log("too slow");
-                            // TODO show message
-                            $('#opinions-visibility-btn').button('toggle');
-                            toggleDensityPlotUpdate();
-                        }
-                    }
-                }
-            }
+            var stepsDuration = 0;
+            var plotDuration = -1;
+            var nextPlotsTimestep = -1;
+            var plotsToRefresh = false;
             function refreshLoop() {
-                refresh();
-                if (simulationRun) {
-                    setTimeout(refreshLoop, 200);
+                if (plotsToRefresh) {
+                    plotsToRefresh = false;
+                    refresh(iteration);
                 }
+                setTimeout(refreshLoop, 200);
             }
             function simulation() {
                 if (simulationRun) {
@@ -289,31 +341,59 @@
                                 );
                         var x = new Array(pop.parameters.taille);
                         var y = new Array(pop.parameters.taille);
+                        var ids = [];
                         for (var i = 0; i < pop.parameters.taille; i++) {
-                            x.push(pop.population[i].sBavg[0][0]);
-                            y.push(pop.population[i].sBavg[0][1]);
+                            x[i] = pop.population[i].sBavg[0][0];
+                            y[i] = pop.population[i].sBavg[0][1];
+                            if (pop.population[i].isExtremist()) {
+                                ids.push(i);
+                            }
                         }
                         opinionsTs.push([x, y]);
-                        updatePlotIndicators();
-                        plotIndicators(indicatorsTs);
-                        refresh();
+                        extremistId.push(ids);
+                        initPlotIndicators(indicatorsTs);
+                        var start = new Date().getTime();
+                        updatePlotIndicators(iteration);
+                        plotDuration = new Date().getTime() - start;
                     }
                     iteration = iteration + 1;
+                    var start = new Date().getTime();
                     pop.iter(iteration);
+                    stepsDuration = stepsDuration + new Date().getTime() - start;
                     var x = new Array(pop.parameters.taille);
                     var y = new Array(pop.parameters.taille);
                     for (var i = 0; i < pop.parameters.taille; i++) {
-                        x.push(pop.population[i].sBavg[0][0]);
-                        y.push(pop.population[i].sBavg[0][1]);
+                        x[i] = pop.population[i].sBavg[0][0];
+                        y[i] = pop.population[i].sBavg[0][1];
                     }
                     opinionsTs.push([x, y]);
-                    updatePlotIndicators();
+                    var frequency = $('#plots-frequency input:checked').attr('value');
+                    if (frequency !== "off") {
+                        if (nextPlotsTimestep === -1) {
+                            computeNextPlotsTimestep(frequency);
+                        }
+                        if (iteration === nextPlotsTimestep) {
+                            updatePlotIndicators(iteration);
+                            plotsToRefresh = true;
+                            computeNextPlotsTimestep(frequency);
+                        }
+                    }
                     itSlider.val(iteration);
                     itSliderVal.text(iteration);
                     simulationRun = iteration < stopIteration;
                     setTimeout(simulation, 0);
                 } else {
                     setButtonsStates(true, false, true);
+                }
+            }
+            function computeNextPlotsTimestep(frequency) {
+                if (frequency === 'auto') {
+                    nextPlotsTimestep = iteration + Math.round(plotDuration / (stepsDuration / iteration) * 4);
+                } else {
+                    nextPlotsTimestep = iteration + parseInt(frequency, 0);
+                    if (iteration ===1) {
+                        nextPlotsTimestep -= 1;
+                    }
                 }
             }
             var playBtn = $('#play-btn');
@@ -342,7 +422,7 @@
                     paused = false;
                 }
                 setTimeout(simulation, 0);
-                setTimeout(refreshLoop, 0);
+                setTimeout(refreshLoop, 200);
             }
             function pause() {
                 simulationRun = false;
@@ -368,17 +448,20 @@
                 }
                 stopIteration = step;
             });
+            itSlider.on("change", function () {
+                if (this.value <= iteration) {
+                    updatePlotIndicators(parseInt(this.value, 10));
+                    refresh(this.value);
+                }
+            });
             itSlider.on("input", function () {
                 if (this.value > iteration) {
                     itSlider.val(iteration);
                 } else {
                     itSliderVal.text(this.value);
-                    plotOpinions(opinionsTs[this.value][0], opinionsTs[this.value][1], this.value);
                 }
             });
-            $('#opinions-visibility-btn').on('click', function () {
-                toggleDensityPlotUpdate();
-            });
+            // TODO computeNextPlotsTimestep() when frequency button changed
             // Ok, we're ready
             initSimulation();
         </script>
