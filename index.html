@@ -249,9 +249,12 @@
                 var insertionIndex = indicatorsRange.findIndex(function (x) {
                     return x > timestep;
                 });
-                if (insertionIndex <0) {
+                if (insertionIndex < 0) {
                     // no index greater, so we should append to the end
-                    insertionIndex=indicatorsRange.length;
+                    insertionIndex = indicatorsRange.length;
+                } else if (indicatorsRange[insertionIndex] === timestep) {
+                    // indicators for this timestep have been already computed, so passing
+                    return;
                 }
                 indicatorsTs.nbClusters.splice(insertionIndex, 0, getClusters(timestep, 0.01).length);
                 indicatorsTs.opAvg0.splice(insertionIndex, 0, getOpAvg(timestep, 0));
@@ -322,11 +325,13 @@
             var nextPlotsTimestep = -1;
             var plotsToRefresh = false;
             function refreshLoop() {
-                if (plotsToRefresh) {
-                    plotsToRefresh = false;
-                    refresh(iteration);
+                if (simulationRun) {
+                    if (plotsToRefresh) {
+                        plotsToRefresh = false;
+                        refresh(iteration);
+                    }
+                    setTimeout(refreshLoop, 200);
                 }
-                setTimeout(refreshLoop, 200);
             }
             function simulation() {
                 if (simulationRun) {
@@ -391,7 +396,7 @@
                     nextPlotsTimestep = iteration + Math.round(plotDuration / (stepsDuration / iteration) * 4);
                 } else {
                     nextPlotsTimestep = iteration + parseInt(frequency, 0);
-                    if (iteration ===1) {
+                    if (iteration === 1) { // fix for first iteration, for avoiding disgracious shift
                         nextPlotsTimestep -= 1;
                     }
                 }
