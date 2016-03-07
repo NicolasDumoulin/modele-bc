@@ -78,7 +78,7 @@ function plotOpinions(x, y, step) {
         title: 'Opinions densities at step ' + step,
         showlegend: false,
         autosize: false,
-        width: 600,
+        width: 580,
         height: 550,
         margin: {t: 50},
         hovermode: 'closest',
