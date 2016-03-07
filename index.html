@@ -409,10 +409,12 @@
             }
             function computeNextPlotsTimestep(frequency) {
                 if (frequency === 'auto') {
-                    nextPlotsTimestep = iteration + Math.round(plotDuration / (stepsDuration / iteration) * 4);
+                    nextPlotsTimestep = iteration + Math.round(plotDuration / (stepsDuration / iteration) * 6);
+                } else if (frequency === 'off') {
+                    nextPlotsTimestep = -1;
                 } else {
                     nextPlotsTimestep = iteration + parseInt(frequency, 0);
-                    if (iteration === 1) { // fix for first iteration, for avoiding disgracious shift
+                    if (iteration === 1 && nextPlotsTimestep>iteration+1) { // fix for first iteration, for avoiding disgracious shift
                         nextPlotsTimestep -= 1;
                     }
                 }
@@ -482,7 +484,9 @@
                     itSliderVal.text(this.value);
                 }
             });
-            // TODO computeNextPlotsTimestep() when frequency button changed
+            $('#plots-frequency input').on('change', function () {
+                computeNextPlotsTimestep($(this).attr('value'));
+            });
             // Ok, we're ready
             initSimulation();
         </script>
