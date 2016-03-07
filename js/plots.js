@@ -97,6 +97,12 @@ function initPlotIndicators(indicatorsTs) {
         y: indicatorsTs.nbClusters,
         type: 'scatter'
     };
+    var traceIsolatedInd = {
+        name: 'nb isolated ind',
+        x: indicatorsRange,
+        y: indicatorsTs.nbIsolatedInd,
+        type: 'scatter'
+    };
     var trace2 = {
         name: 'opinion 1',
         x: indicatorsRange,
@@ -111,7 +117,7 @@ function initPlotIndicators(indicatorsTs) {
         yaxis: 'y2',
         type: 'scatter'
     };
-    var data = [trace1, trace2, trace3];
+    var data = [trace1, traceIsolatedInd, trace2, trace3];
     Plotly.newPlot('plot-indicators', data, {width: 600, height: 550, yaxis: {title: 'nb clusters', range: [0, 5000]},
         yaxis2: {
             title: 'opinions mean (absolute values)',
@@ -132,7 +138,9 @@ function updatePlotIndicators(timestep) {
         // indicators for this timestep have been already computed, so passing
         return;
     }
-    indicatorsTs.nbClusters.splice(insertionIndex, 0, getClusters(timestep, 0.01).length);
+    var clusters = getClusters(timestep, 0.01);
+    indicatorsTs.nbIsolatedInd.splice(insertionIndex, 0, clusters[0]);
+    indicatorsTs.nbClusters.splice(insertionIndex, 0, clusters[1].length);
     indicatorsTs.opAvg0.splice(insertionIndex, 0, getOpAvg(timestep, 0));
     indicatorsTs.opAvg1.splice(insertionIndex, 0, getOpAvg(timestep, 1));
     indicatorsRange.splice(insertionIndex, 0, timestep);
@@ -166,14 +174,19 @@ function getClusters(timestep, epsilon) {
     });
     var opinions = opinionsTs[timestep];
     var clusters = [];
+    var nbIsolatedIndividuals = 0;
     while (todo.length > 0) {
         var currentIndex = todo.pop();
         var currentIndiv = [opinions[0][currentIndex], opinions[1][currentIndex]];
         var currentCluster = [currentIndiv].concat(todo.filterAndRemove(function (elt) {
             return Individual.distance(currentIndiv[0], currentIndiv[1], opinions[0][elt], opinions[1][elt]) < epsilon;
         }));
-        clusters.push(currentCluster);
+        if (currentCluster.length >= pop.population.length / 100) {
+            clusters.push(currentCluster);
+        } else {
+            nbIsolatedIndividuals += currentCluster.length;
+        }
     }
-    return clusters;
+    return [nbIsolatedIndividuals, clusters];
 }
  
