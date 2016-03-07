@@ -21,11 +21,7 @@ function randomNextDouble(max) {
 }
 
 function Individual(parameters) {
-    if (randomNextDouble() < parameters.egoInvolvedPart) {
-        this.poids = [0.5, 0.9];
-    } else {
-        this.poids = [0.0, 0.0];
-    }
+    this.poids = [0.0, 0.0];
     this.mu = parameters.mu;
     this.sBavg = matrix(parameters.nbObjetsConnus, parameters.nbSubjBelief, 0.0);
     this.sBunc = matrix(parameters.nbObjetsConnus, parameters.nbSubjBelief, 0.0);
@@ -40,11 +36,11 @@ Individual.prototype.setExtremist = function (opinion) {
     this.sBavg[0][1] = opinion;
     this.sBunc[0][1] = 0.0;
 };
-Individual.distance = function(opA1, opA2, opB1, opB2) {
+Individual.distance = function (opA1, opA2, opB1, opB2) {
     return Math.sqrt(Math.pow(opA1 - opB1, 2) + Math.pow(opA2 - opB2, 2));
 };
 Individual.prototype.distance = function (indiv) {
-    return Individual.distance(this.sBavg[0][0],this.sBavg[0][1],indiv.sBavg[0][0],indiv.sBavg[0][1]);
+    return Individual.distance(this.sBavg[0][0], this.sBavg[0][1], indiv.sBavg[0][0], indiv.sBavg[0][1]);
 };
 
 function range(n) {
@@ -87,6 +83,13 @@ function Population(popSize, pe, egoInvolvedPart, mu, valBaseIncert, type) {
                 this.population[i].sBunc[z][j] = this.parameters.valBaseIncert[j];
             }
         }
+        // CECI NE MARCHE PAS :
+        if (Math.random() < this.parameters.highlyEngaged) {
+            //if (i < this.parameters.taille * this.parameters.highlyEngaged) { ce test ne marche pas non plus : il ne récupère pas ce paramètre
+            this.population[i].poids[0] = 0.5;
+            this.population[i].poids[1] = 0.9;
+        }
+
         // initialization of extremist
         if (i < this.parameters.taille * this.parameters.partExtremist / 2) {
             // first side
@@ -347,7 +350,7 @@ Population.prototype.discussionMouvARHierarchise = function (a, b, objet) {
     }
     // The main dimension is defined by poids[i]
     for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
-        if (dist[i] >= 0) {
+        if (dist[i] >= 0) { //si proche sur i
             selfRelevancePos = selfRelevancePos + 1 / b.poids[i];
         } else {
             selfRelevanceNeg = selfRelevanceNeg + 1 / b.poids[i];
@@ -356,15 +359,13 @@ Population.prototype.discussionMouvARHierarchise = function (a, b, objet) {
     if (selfRelevancePos === selfRelevanceNeg) { // nothing is more important than other
         mouvAvgDim = this.discussionMouvBC2DSimple(a, b, objet);
     } else if (selfRelevancePos > selfRelevanceNeg) { // The individual defines itself positively in regards to A
-        // Attraction on every dimensions
-        for (i = 0; i < this.parameters.nbSubjBelief; i++) {
+        for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
             mouvAvgDim[i] = this.attractionWithoutConditionMouv(a, b, objet, i);
         }
-    } else { // The individual defines itself positively in regards to B
-        // Rejection on every dimension of closeness (< U)
-        for (i = 0; i < this.parameters.nbSubjBelief; i++) {
-            if (dist[i] >= 0) { // rejection on closeness dimension if same sign as me
-                mouvAvgDim[i] = -b.mu[i] * this.influenceAvg(a, b, objet, i);
+    } else {
+        for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
+            if (dist[i] >= 0) {
+                mouvAvgDim[i] = -b.mu[i] * this.influenceAvg(a, b, objet, i); //rejet car loin sur 0 et proche sur 1
             }
         }
     }
