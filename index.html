@@ -1,5 +1,5 @@
  
- <html>
+<html>
     <head>
         <title>Various Bounded Confidence</title>
         <link href="css/bootstrap-3.3.6.min.css" rel="stylesheet">
@@ -10,17 +10,6 @@
         <script type="text/javascript" src="js/bootstrap-3.3.6.min.js"></script>
     </head>
     <body>
-        <div class="modal fade" id="confirm-stop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog"><div class="modal-content">
-                    <div class="modal-header"><h4 class="modal-title" id="myModalLabel">Confirmation</h4></div>
-                    <div class="modal-body">Are you sure to stop this simulation and to reset all the results?</div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button id="stop-confirmed" type="button" class="btn btn-danger danger">Stop</button>
-                    </div>
-                </div>
-            </div>
-        </div>                
         <div class="container">
             <div class="jumbotron">
                 <h1>Various Bounded Confidence</h1>
@@ -37,21 +26,8 @@
                 </div>
             </div-->
             <div id="simulator">
-                <div>
-                    <form class="form-inline">
-                        <div class="input-group col-sm-4">
-                            <span class="input-group-addon">Nb steps to run</span>
-                            <input type="number" class="form-control" id="nbSteps" value="3000">
-                        </div>
-                        <div class="btn-group col-sm-4">
-                            <button type="button" id="play-btn" class="btn btn-default"><span class="glyphicon glyphicon-play"> Play</span></button>
-                            <button type="button" id="pause-btn" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-pause"> Pause</span></button>
-                            <button type="button" id="stop-btn" class="btn btn-default" disabled="disabled" data-toggle="modal" data-target="#confirm-stop"><span class="glyphicon glyphicon-stop"> Stop</span></button>
-                        </div>
-                    </form>
-                </div>
                 <div class="input-group col-sm-12">
-                    <span class="input-group-addon">Iteration</span>
+                    <label id="play-btn" class="btn btn-default input-group-addon"><span class="glyphicon glyphicon-play"></span></label>
                     <span class="input-group-addon" id="iterationSlider-val">0</span>
                     <input id="iterationSlider" class="form-control" type="range" min="0" value="0"/>
                     <span class="input-group-addon" id="iterationSlider-max"></span>
@@ -131,18 +107,24 @@
                                     <input type="number" class="form-control" id="valBaseIncert1" value="0.1" step="0.1" min="0" max="1">
                                 </div>
                             </div>
-                            <!--div class="form-group">
-                                <label for="typeRencontre"  class="col-sm-4">Type rencontre</label>
+                            <div class="form-group">
+                                <label for="nbSteps" class="col-sm-4">Nb steps to run</label>
                                 <div class="col-sm-4">
-                                    <select class="form-control" id="typeRencontre">
-                                        <option value="0">PBC JDM</option>
-                                        <option value="1">BC simple</option>
-                                        <option value="2">Relative Agreement</option>
-                                        <option value="3">MouvARNonHierarchise</option>
-                                        <option value="4" selected="selected">MouvARHierarchise</option>
-                                    </select>
+                                    <input type="number" class="form-control" id="nbSteps" value="3000">
                                 </div>
-                            </div-->
+                            </div>
+                            <!--div class="form-group">
+                                    <label for="typeRencontre"  class="col-sm-4">Type rencontre</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" id="typeRencontre">
+                                            <option value="0">PBC JDM</option>
+                                            <option value="1">BC simple</option>
+                                            <option value="2">Relative Agreement</option>
+                                            <option value="3">MouvARNonHierarchise</option>
+                                            <option value="4" selected="selected">MouvARHierarchise</option>
+                                        </select>
+                                    </div>
+                                </div-->
                         </form>
                     </div>
                     <div role="tabpanel" class="tab-pane" id="plots">
@@ -183,7 +165,6 @@
                 itSliderVal.text('0');
                 itSlider.attr('max', stopIteration);
                 itSliderMax.text(stopIteration);
-                setButtonsStates(true, false, true);
             }
             function simulation() {
                 if (simulationRun) {
@@ -239,7 +220,8 @@
                     simulationRun = iteration < stopIteration;
                     setTimeout(simulation, 0);
                 } else {
-                    setButtonsStates(true, false, true);
+                    $('#play-btn span').removeClass('glyphicon-pause');
+                    $('#play-btn span').addClass('glyphicon-play');
                 }
             }
             var playBtn = $('#play-btn');
@@ -248,51 +230,39 @@
             var itSlider = $("#iterationSlider");
             var itSliderMax = $("#iterationSlider-max");
             var itSliderVal = $("#iterationSlider-val");
-            function setButtonsStates(play, pause, stop) {
-                playBtn.prop('disabled', !play);
-                pauseBtn.prop('disabled', !pause);
-                stopBtn.prop('disabled', !stop);
-            }
             // Controls events
-            function play() {
-                $('html, body').animate({scrollTop: $('#simulator').position().top}, 500);
-                $('#config input').prop("disabled", true);
-                $('#config select').prop("disabled", true);
-                $('#tabs a[href="#plots"]').tab('show');
-                simulationRun = true;
-                setButtonsStates(false, true, true);
-                if (!paused) {
-                    stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
-                    itSlider.attr('max', stopIteration);
-                    itSliderMax.text(stopIteration);
+            playBtn.click(function () {
+                if (simulationRun) {
+                    $('#play-btn span').removeClass('glyphicon-pause');
+                    $('#play-btn span').addClass('glyphicon-play');
+                    simulationRun = false;
+                    paused = true;
+                    updatePlotIndicators(iteration);
                 } else {
-                    paused = false;
+                    $('html, body').animate({scrollTop: $('#simulator').position().top}, 500);
+                    $('#play-btn span').removeClass('glyphicon-play');
+                    $('#play-btn span').addClass('glyphicon-pause');
+                    $('#config input').prop("disabled", true);
+                    $('#nbSteps').prop("disabled", false);
+                    $('#config select').prop("disabled", true);
+                    $('#tabs a[href="#plots"]').tab('show');
+                    simulationRun = true;
+                    if (!paused) {
+                        stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
+                        itSlider.attr('max', stopIteration);
+                        itSliderMax.text(stopIteration);
+                    } else {
+                        paused = false;
+                    }
+                    setTimeout(simulation, 0);
+                    setTimeout(refreshLoop, 200);
                 }
-                setTimeout(simulation, 0);
-                setTimeout(refreshLoop, 200);
-            }
-            function pause() {
-                simulationRun = false;
-                paused = true;
-                setButtonsStates(true, false, true);
-                updatePlotIndicators(iteration);
-            }
-            playBtn.click(play);
-            pauseBtn.click(pause);
-            stopBtn.click(pause);
-            $('#stop-confirmed').click(function () {
-                initSimulation();
-                $('#config input').prop("disabled", false);
-                $('#config select').prop("disabled", false);
-                $('#tabs a[href="#config"]').tab('show');
-                $('#confirm-stop').modal('hide');
             });
             $('#nbSteps').on("input", function () {
+                console.log('nbsteps');
                 var step = iteration + parseInt(this.value, 10);
-                if (iteration === 0) {
-                    itSlider.attr('max', step);
-                    itSliderMax.text(step);
-                }
+                itSlider.attr('max', step);
+                itSliderMax.text(step);
                 stopIteration = step;
             });
             itSlider.on("change", function () {
