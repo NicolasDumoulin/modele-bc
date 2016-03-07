@@ -264,7 +264,7 @@
                 indicatorsTs.opAvg0.splice(insertionIndex, 0, getOpAvg(timestep, 0));
                 indicatorsTs.opAvg1.splice(insertionIndex, 0, getOpAvg(timestep, 1));
                 indicatorsRange.splice(insertionIndex, 0, timestep);
-                plotsToRefresh = true;
+                plotsToRefresh = timestep;
             }
             function getOpAvg(timestep, subj) {
                 return opinionsTs[timestep][subj].reduce(function (prev, cur) {
@@ -324,7 +324,7 @@
                 stepsDuration = 0;
                 plotDuration = -1;
                 nextPlotsTimestep = -1;
-                plotsToRefresh = false;
+                plotsToRefresh = -1;
                 stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
                 itSlider.val(0);
                 itSliderVal.text('0');
@@ -339,12 +339,12 @@
             var stepsDuration = 0;
             var plotDuration = -1;
             var nextPlotsTimestep = -1;
-            var plotsToRefresh = false;
+            var plotsToRefresh = -1;
             function refreshLoop() {
                 if (simulationRun) {
-                    if (plotsToRefresh) {
-                        plotsToRefresh = false;
-                        refresh(iteration);
+                    if (plotsToRefresh > -1) {
+                        refresh(plotsToRefresh);
+                        plotsToRefresh = -1;
                     }
                     setTimeout(refreshLoop, 200);
                 }
@@ -395,7 +395,6 @@
                         }
                         if (iteration === nextPlotsTimestep) {
                             updatePlotIndicators(iteration);
-                            plotsToRefresh = true;
                             computeNextPlotsTimestep(frequency);
                         }
                     }
@@ -414,7 +413,7 @@
                     nextPlotsTimestep = -1;
                 } else {
                     nextPlotsTimestep = iteration + parseInt(frequency, 0);
-                    if (iteration === 1 && nextPlotsTimestep>iteration+1) { // fix for first iteration, for avoiding disgracious shift
+                    if (iteration === 1 && nextPlotsTimestep > iteration + 1) { // fix for first iteration, for avoiding disgracious shift
                         nextPlotsTimestep -= 1;
                     }
                 }
