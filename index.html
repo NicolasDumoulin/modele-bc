@@ -259,7 +259,6 @@
                 }
             });
             $('#nbSteps').on("input", function () {
-                console.log('nbsteps');
                 var step = iteration + parseInt(this.value, 10);
                 itSlider.attr('max', step);
                 itSliderMax.text(step);
