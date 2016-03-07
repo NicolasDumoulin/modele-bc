@@ -23,7 +23,6 @@ function computeNextPlotsTimestep(frequency) {
         }
     }
 }
-// FIXME color scale is cropped on the right for numbers >= 1000
 function plotOpinions(x, y, step) {
     var data = [{
             x: x,
