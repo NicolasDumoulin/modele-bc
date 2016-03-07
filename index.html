@@ -341,11 +341,11 @@
             var nextPlotsTimestep = -1;
             var plotsToRefresh = -1;
             function refreshLoop() {
+                if (plotsToRefresh > -1) {
+                    refresh(plotsToRefresh);
+                    plotsToRefresh = -1;
+                }
                 if (simulationRun) {
-                    if (plotsToRefresh > -1) {
-                        refresh(plotsToRefresh);
-                        plotsToRefresh = -1;
-                    }
                     setTimeout(refreshLoop, 200);
                 }
             }
@@ -451,6 +451,7 @@
                 simulationRun = false;
                 paused = true;
                 setButtonsStates(true, false, true);
+                updatePlotIndicators(iteration);
             }
             playBtn.click(play);
             pauseBtn.click(pause);
