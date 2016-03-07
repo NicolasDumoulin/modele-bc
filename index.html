@@ -170,7 +170,10 @@
                         colorscale: 'Hot',
                         reversescale: true,
                         showscale: true,
-                        type: 'histogram2dcontour'
+                        type: 'histogram2dcontour',
+                        zmin:0,
+                        // custom scale for having no countours on uniform distribution at init
+                        zmax:pop.population.length/4
                     }, {
                         x: x,
                         name: 'opinion 1 density',
@@ -191,7 +194,7 @@
                     showgrid: false,
                     zeroline: false
                 };
-                var densitiAxis = {
+                var densityAxis = {
                     domain: [0.85, 1],
                     showgrid: false,
                     zeroline: false
@@ -207,13 +210,12 @@
                     bargap: 0,
                     xaxis: $.extend({title: 'opinion 1'}, opinionAxis),
                     yaxis: $.extend({title: 'opinion 2'}, opinionAxis),
-                    xaxis2: densitiAxis,
-                    yaxis2: densitiAxis
+                    xaxis2: densityAxis,
+                    yaxis2: densityAxis
                 };
                 p = Plotly.newPlot('plot-opinions', data, layout);
                 return [p, x, y];
             }
-            // TODO échelle de couleurs commence à 0,200 (cf. quand on démarre avec des extrémistes)
             function initPlotIndicators(indicatorsTs) {
                 var trace1 = {
                     name: 'nb clusters',
