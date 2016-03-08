@@ -39,15 +39,18 @@ function plotOpinions(x, y, step) {
             x: x,
             y: y,
             name: 'density',
-            ncontours: 20,
             colorscale: 'Hot',
             reversescale: true,
             showscale: true,
             type: 'histogram2dcontour',
             zmin: 0,
-            // custom scale for having no countours on uniform distribution at init
-            // FIXME strange colorscale behaviour for pe=0,2 and u=[1.2,1.2] around step 450
-            zmax: pop.population.length / 4
+            zmax: pop.population.length / 4,
+            contours: {showlines: false},
+            // small cell size for more precise cluster detection
+            xbins: {start: -1, end: 1, size: 0.1},
+            ybins: {start: -1, end: 1, size: 0.1},
+            // disable countours on uniform distribution at init
+            visible: indicatorsTs.nbIsolatedInd[indicatorsRange.indexOf(step)] < pop.population.length / 6
         }, {
             x: x,
             name: 'opinion 1 density',
@@ -118,7 +121,7 @@ function initPlotIndicators(indicatorsTs) {
         type: 'scatter'
     };
     var data = [trace1, traceIsolatedInd, trace2, trace3];
-    Plotly.newPlot('plot-indicators', data, {width: 600, height: 550, yaxis: {title: 'nb clusters', range: [0, 5000]},
+    Plotly.newPlot('plot-indicators', data, {width: 600, height: 550, yaxis: {title: 'nb clusters', range: [0, pop.population.length]},
         yaxis2: {
             title: 'opinions mean (absolute values)',
             range: [0, 1],
