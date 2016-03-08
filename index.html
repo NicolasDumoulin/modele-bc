@@ -10,6 +10,17 @@
         <script type="text/javascript" src="js/bootstrap-3.3.6.min.js"></script>
     </head>
     <body>
+        <div class="modal fade" id="confirm-stop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog"><div class="modal-content">
+                    <div class="modal-header"><h4 class="modal-title" id="myModalLabel">Confirmation</h4></div>
+                    <div class="modal-body">Are you sure to stop this simulation and to reset all the results?</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button id="stop-confirmed" type="button" class="btn btn-danger danger">Stop</button>
+                    </div>
+                </div>
+            </div>
+        </div>                
         <div class="container">
             <div class="jumbotron">
                 <h1>Various Bounded Confidence</h1>
@@ -31,6 +42,7 @@
                     <span class="input-group-addon" id="iterationSlider-val">0</span>
                     <input id="iterationSlider" class="form-control" type="range" min="0" value="0"/>
                     <span class="input-group-addon" id="iterationSlider-max"></span>
+                    <label id="stop-btn" class="btn btn-default input-group-addon"><span class="glyphicon glyphicon-stop"  data-toggle="modal" data-target="#confirm-stop"></span></label>
                 </div>
                 <form  id="plots-frequency">
                     <div class="input-group col-sm-6">
@@ -134,7 +146,7 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript">
+            <script type="text/javascript">
             var simulationRun = true;
             var stopIteration = 0;
             var paused = false;
@@ -148,7 +160,7 @@
             var plotDuration = -1;
             var nextPlotsTimestep = -1;
             var plotsToRefresh = -1;
-            function initSimulation() {
+                function initSimulation() {
                 $('#plot-opinions').empty();
                 $('#plot-indicators').empty();
                 opinionsTs = [];
@@ -231,12 +243,15 @@
             var itSliderMax = $("#iterationSlider-max");
             var itSliderVal = $("#iterationSlider-val");
             // Controls events
+            function pause() {
+                $('#play-btn span').removeClass('glyphicon-pause');
+                $('#play-btn span').addClass('glyphicon-play');
+                simulationRun = false;
+                paused = true;
+            }
             playBtn.click(function () {
                 if (simulationRun) {
-                    $('#play-btn span').removeClass('glyphicon-pause');
-                    $('#play-btn span').addClass('glyphicon-play');
-                    simulationRun = false;
-                    paused = true;
+                    pause();
                     updatePlotIndicators(iteration);
                 } else {
                     $('html, body').animate({scrollTop: $('#simulator').position().top}, 500);
@@ -257,6 +272,14 @@
                     setTimeout(simulation, 0);
                     setTimeout(refreshLoop, 200);
                 }
+            });
+            stopBtn.click(pause);
+            $('#stop-confirmed').click(function () {
+                initSimulation();
+                $('#config input').prop("disabled", false);
+                $('#config select').prop("disabled", false);
+                $('#tabs a[href="#config"]').tab('show');
+                $('#confirm-stop').modal('hide');
             });
             $('#nbSteps').on("input", function () {
                 var step = iteration + parseInt(this.value, 10);
