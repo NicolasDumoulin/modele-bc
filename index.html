@@ -290,7 +290,7 @@
             itSlider.on("change", function () {
                 if (this.value <= iteration) {
                     updatePlotIndicators(parseInt(this.value, 10));
-                    refresh(this.value);
+                    refresh(parseInt(this.value, 10));
                 }
             });
             itSlider.on("input", function () {
