@@ -70,59 +70,63 @@
                 </form>
                 <!-- Nav tabs -->
                 <ul id="tabs" class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#config" aria-controls="config" role="tab" data-toggle="tab">Config</a></li>
+                    <li role="presentation" class="active"><a href="#config" aria-controls="config" role="tab" data-toggle="tab">Config</a></li>                        
                     <li role="presentation"><a href="#plots" aria-controls="plots" role="tab" data-toggle="tab">Plots</a></li>
+                    <a id="permalink" href="" class="btn glyphicon glyphicon-link"
+                       type="button" title="Permalink to current parameters, for sharing or bookmarking your experiment."></a>
+                    <button id="resetParameters" href="" class="btn glyphicon glyphicon-trash"
+                            type="button" title="Reset to default parameters."></button>
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="config">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
-                                <label for="popSizeInput"  class="col-sm-4">Pop size</label>
+                                <label for="args-popsize"  class="col-sm-4">Pop size</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="popSizeInput" value="5000">
+                                    <input type="number" class="form-control" id="args-popsize">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="pe"  class="col-sm-4">Part of extremist on each dimension</label>
+                                <label for="args-pe"  class="col-sm-4">Part of extremist on each dimension</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="pe" value="0.0" step="0.1" min="0" max="1">
+                                    <input type="number" class="form-control" id="args-pe" step="0.1" min="0" max="1">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="egoInvolvedPart"  class="col-sm-4">Part of highly self-engaged in dimension 1</label>
+                                <label for="args-eip"  class="col-sm-4">Part of highly self-engaged in dimension 1</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="egoInvolvedPart" value="0.0" step="0.1" min="0" max="1">
+                                    <input type="number" class="form-control" id="args-eip" step="0.1" min="0" max="1">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="mu0"  class="col-sm-4">mu dimension 1</label>
+                                <label for="args-mu0"  class="col-sm-4">mu dimension 1</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="mu0" value="0.5" step="0.1" min="0" max="1">
+                                    <input type="number" class="form-control" id="args-mu0" step="0.1" min="0" max="1">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="mu1"  class="col-sm-4">mu dimension 2</label>
+                                <label for="args-mu1"  class="col-sm-4">mu dimension 2</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="mu1" value="0.5" step="0.1" min="0" max="1">
+                                    <input type="number" class="form-control" id="args-mu1" step="0.1" min="0" max="1">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="valBaseIncert0"  class="col-sm-4">uncertainty on dimension 1</label>
+                                <label for="args-u0"  class="col-sm-4">uncertainty on dimension 1</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="valBaseIncert0" value="0.3" step="0.1" min="0" max="1">
+                                    <input type="number" class="form-control" id="args-u0" step="0.1" min="0" max="1">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="valBaseIncert1"  class="col-sm-4">uncertainty on dimension 2</label>
+                                <label for="args-u1"  class="col-sm-4">uncertainty on dimension 2</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="valBaseIncert1" value="0.1" step="0.1" min="0" max="1">
+                                    <input type="number" class="form-control" id="args-u1" step="0.1" min="0" max="1">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="nbSteps" class="col-sm-4">Nb steps to run</label>
+                                <label for="args-nbSteps" class="col-sm-4">Nb steps to run</label>
                                 <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="nbSteps" value="3000">
+                                    <input type="number" class="form-control" id="args-nbSteps">
                                 </div>
                             </div>
                             <!--div class="form-group">
@@ -146,7 +150,7 @@
                 </div>
             </div>
         </div>
-            <script type="text/javascript">
+        <script type="text/javascript">
             var simulationRun = true;
             var stopIteration = 0;
             var paused = false;
@@ -160,7 +164,40 @@
             var plotDuration = -1;
             var nextPlotsTimestep = -1;
             var plotsToRefresh = -1;
-                function initSimulation() {
+            function loadURLArguments() {
+                // load default parameters
+                resetParameters();
+                // load URL arguments
+                var params = (window.location.hash.substr(1)).split("&");
+                for (i = 0; i < params.length; i++) {
+                    var a = params[i].split("=");
+                    $('#args-' + a[0]).val(a[1]);
+                }
+            }
+            function updatePermalink() {
+                var urlHash = "";
+                $('#config input').each(function (input) {
+                    var name = $(this).attr('id').replace('args-', '');
+                    urlHash += name + "=" + $(this).val() + "&";
+                });
+                $('#permalink').attr('href', "#" + urlHash.slice(0, -1));
+            }
+            /**
+             * Resets to default parameters
+             */
+            function resetParameters() {
+                $('#args-popsize').val(5000);
+                $('#args-pe').val(0);
+                $('#args-eip').val(0);
+                $('#args-mu0').val(0.5);
+                $('#args-mu1').val(0.5);
+                $('#args-u0').val(0.3);
+                $('#args-u1').val(0.1);
+                $('#args-nbSteps').val(3000);
+                // force slider update
+                $('#args-nbSteps').trigger("input");
+            }
+            function initSimulation() {
                 $('#plot-opinions').empty();
                 $('#plot-indicators').empty();
                 opinionsTs = [];
@@ -172,21 +209,22 @@
                 plotDuration = -1;
                 nextPlotsTimestep = -1;
                 plotsToRefresh = -1;
-                stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
+                stopIteration = iteration + parseInt($('#args-nbSteps').val(), 10);
                 itSlider.val(0);
                 itSliderVal.text('0');
                 itSlider.attr('max', stopIteration);
                 itSliderMax.text(stopIteration);
+                updatePermalink();
             }
             function simulation() {
                 if (simulationRun) {
                     if (opinionsTs.length === 0) {
                         pop = new Population(
-                                parseInt($('#popSizeInput').val(), 10),
-                                parseFloat($('#pe').val(), 10),
-                                parseFloat($('#egoInvolvedPart').val(), 10),
-                                [parseFloat($('#mu0').val(), 10), parseFloat($('#mu1').val(), 10)],
-                                [parseFloat($('#valBaseIncert0').val(), 10), parseFloat($('#valBaseIncert1').val(), 10)]
+                                parseInt($('#args-popsize').val(), 10),
+                                parseFloat($('#args-pe').val(), 10),
+                                parseFloat($('#args-eip').val(), 10),
+                                [parseFloat($('#args-mu0').val(), 10), parseFloat($('#args-mu1').val(), 10)],
+                                [parseFloat($('#args-u0').val(), 10), parseFloat($('#args-u1').val(), 10)]
                                 //parseInt($('#typeRencontre').val(), 10)
                                 );
                         var x = new Array(pop.parameters.taille);
@@ -243,6 +281,9 @@
             var itSliderMax = $("#iterationSlider-max");
             var itSliderVal = $("#iterationSlider-val");
             // Controls events
+            $('#config input').on('change', function () {
+                updatePermalink();
+            });
             function pause() {
                 $('#play-btn span').removeClass('glyphicon-pause');
                 $('#play-btn span').addClass('glyphicon-play');
@@ -257,13 +298,14 @@
                     $('html, body').animate({scrollTop: $('#simulator').position().top}, 500);
                     $('#play-btn span').removeClass('glyphicon-play');
                     $('#play-btn span').addClass('glyphicon-pause');
+                    $('#resetParameters').hide();
                     $('#config input').prop("disabled", true);
-                    $('#nbSteps').prop("disabled", false);
+                    $('#args-nbSteps').prop("disabled", false);
                     $('#config select').prop("disabled", true);
                     $('#tabs a[href="#plots"]').tab('show');
                     simulationRun = true;
                     if (!paused) {
-                        stopIteration = iteration + parseInt($('#nbSteps').val(), 10);
+                        stopIteration = iteration + parseInt($('#args-nbSteps').val(), 10);
                         itSlider.attr('max', stopIteration);
                         itSliderMax.text(stopIteration);
                     } else {
@@ -278,10 +320,16 @@
                 initSimulation();
                 $('#config input').prop("disabled", false);
                 $('#config select').prop("disabled", false);
+                $('#resetParameters').show();
                 $('#tabs a[href="#config"]').tab('show');
                 $('#confirm-stop').modal('hide');
             });
-            $('#nbSteps').on("input", function () {
+            $('#resetParameters').on('click', function () {
+                resetParameters();
+                window.location.hash = "";
+                updatePermalink();
+            });
+            $('#args-nbSteps').on("input", function () {
                 var step = iteration + parseInt(this.value, 10);
                 itSlider.attr('max', step);
                 itSliderMax.text(step);
@@ -305,6 +353,7 @@
             });
             // Ok, we're ready
             initSimulation();
+            loadURLArguments();
             // <!-- Piwik -->
             var _paq = _paq || [];
             _paq.push(["setDomains", ["*.motive.cemagref.fr"]]);
@@ -320,7 +369,8 @@
                 g.defer = true;
                 g.src = u + 'piwik.js';
                 s.parentNode.insertBefore(g, s);
-            })();
+            }
+            )();
             //<!-- End Piwik Code -->
         </script>
     </body>
