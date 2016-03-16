@@ -248,13 +248,20 @@
                     var start = new Date().getTime();
                     pop.iter(iteration);
                     stepsDuration = stepsDuration + new Date().getTime() - start;
-                    var x = new Array(pop.parameters.taille);
-                    var y = new Array(pop.parameters.taille);
+                    var x = new Array();
+                    var y = new Array();
+                    var xHighlyEngaged = new Array();
+                    var yHighlyEngaged = new Array();
                     for (var i = 0; i < pop.parameters.taille; i++) {
-                        x[i] = pop.population[i].sBavg[0][0];
-                        y[i] = pop.population[i].sBavg[0][1];
+                        if (pop.population[i].isHighlyEngaged()) {
+                            xHighlyEngaged.push(pop.population[i].sBavg[0][0]);
+                            yHighlyEngaged.push(pop.population[i].sBavg[0][1]);
+                        } else {
+                            x.push(pop.population[i].sBavg[0][0]);
+                            y.push(pop.population[i].sBavg[0][1]);
+                        }
                     }
-                    opinionsTs.push([x, y]);
+                    opinionsTs.push([x, y, xHighlyEngaged, yHighlyEngaged]);
                     var frequency = $('#plots-frequency input:checked').attr('value');
                     if (frequency !== "off") {
                         if (nextPlotsTimestep === -1) {

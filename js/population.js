@@ -27,6 +27,9 @@ function Individual(parameters) {
     this.sBunc = matrix(parameters.nbObjetsConnus, parameters.nbSubjBelief, 0.0);
 }
 
+Individual.prototype.isHighlyEngaged = function () {
+    return this.poids[0] > 0.0;
+};
 Individual.prototype.isExtremist = function () {
     return this.sBunc[0][0] === 0.0;
 };

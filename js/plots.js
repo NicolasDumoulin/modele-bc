@@ -1,6 +1,6 @@
 function refresh(timestep) {
     Plotly.redraw(document.getElementById('plot-indicators'));
-    plotOpinions(opinionsTs[timestep][0], opinionsTs[timestep][1], timestep);
+    plotOpinions(opinionsTs[timestep], timestep);
 }
 function refreshLoop() {
     if (plotsToRefresh > -1) {
@@ -23,7 +23,13 @@ function computeNextPlotsTimestep(frequency) {
         }
     }
 }
-function plotOpinions(x, y, step) {
+function plotOpinions(opinions, step) {
+    var x = opinions[0];
+    var y = opinions[1];
+    var xHighlyEngaged = opinions[2];
+    var yHighlyEngaged = opinions[3];
+    var allX = x.concat(xHighlyEngaged);
+    var allY = y.concat(yHighlyEngaged);
     var data = [{
             x: x,
             y: y,
@@ -36,8 +42,19 @@ function plotOpinions(x, y, step) {
             },
             type: 'scatter'
         }, {
-            x: x,
-            y: y,
+            x: xHighlyEngaged,
+            y: yHighlyEngaged,
+            mode: 'markers',
+            name: 'points',
+            marker: {
+                color: 'rgb(0,102,0)',
+                size: 3,
+                opacity: 0.5
+            },
+            type: 'scatter'
+        }, {
+            x: allX,
+            y: allY,
             name: 'density',
             colorscale: 'Hot',
             reversescale: true,
