@@ -157,6 +157,7 @@
             var iteration = 0;
             var pop;
             var opinionsTs = []; // opinions time series
+            var timeserieStep = 1;
             var extremistId = []; // extremist IDs
             var indicatorsRange = [];
             var indicatorsTs = {nbClusters: [], nbIsolatedInd: [], opAvg0: [], opAvg1: []};
@@ -201,6 +202,7 @@
                 $('#plot-opinions').empty();
                 $('#plot-indicators').empty();
                 opinionsTs = [];
+                timeserieStep = 1;
                 extremistId = [];
                 indicatorsRange = [];
                 simulationRun = false;
@@ -219,6 +221,7 @@
             function simulation() {
                 if (simulationRun) {
                     if (opinionsTs.length === 0) {
+                        // initialization step
                         pop = new Population(
                                 parseInt($('#args-popsize').val(), 10),
                                 parseFloat($('#args-pe').val(), 10),
@@ -244,6 +247,7 @@
                         updatePlotIndicators(iteration);
                         plotDuration = new Date().getTime() - start;
                     }
+                    // regular step
                     iteration = iteration + 1;
                     var start = new Date().getTime();
                     pop.iter(iteration);
@@ -261,7 +265,8 @@
                             y.push(pop.population[i].sBavg[0][1]);
                         }
                     }
-                    opinionsTs.push([x, y, xHighlyEngaged, yHighlyEngaged]);
+                    // overriding last data in timeserie until we reach the next timeserieStep
+                    opinionsTs[Math.ceil(iteration / timeserieStep)] = [x, y, xHighlyEngaged, yHighlyEngaged];
                     var frequency = $('#plots-frequency input:checked').attr('value');
                     if (frequency !== "off") {
                         if (nextPlotsTimestep === -1) {
@@ -271,6 +276,14 @@
                             updatePlotIndicators(iteration);
                             computeNextPlotsTimestep(frequency);
                         }
+                    }
+                    if (iteration === 1000) {
+                        // dumping 99% of conserved data
+                        timeserieStep = 100;
+                        itSlider.attr('step', timeserieStep);
+                        opinionsTs = opinionsTs.filter(function (elt, i) {
+                            return i % timeserieStep === 0;
+                        });
                     }
                     itSlider.val(iteration);
                     itSliderVal.text(iteration);
@@ -343,6 +356,7 @@
                 stopIteration = step;
             });
             itSlider.on("change", function () {
+                console.log(this.value);
                 if (this.value <= iteration) {
                     updatePlotIndicators(parseInt(this.value, 10));
                     refresh(parseInt(this.value, 10));

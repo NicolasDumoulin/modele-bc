@@ -1,6 +1,10 @@
+function getOpinions(timestep) {
+    // using math.ceil for intermediate timestep
+    return opinionsTs[Math.ceil(timestep / timeserieStep)];
+}
 function refresh(timestep) {
     Plotly.redraw(document.getElementById('plot-indicators'));
-    plotOpinions(opinionsTs[timestep], timestep);
+    plotOpinions(timestep);
 }
 function refreshLoop() {
     if (plotsToRefresh > -1) {
@@ -23,7 +27,8 @@ function computeNextPlotsTimestep(frequency) {
         }
     }
 }
-function plotOpinions(opinions, step) {
+function plotOpinions(step) {
+    opinions = getOpinions(step);
     var x = opinions[0];
     var y = opinions[1];
     var xHighlyEngaged = opinions[2];
@@ -147,6 +152,7 @@ function initPlotIndicators(indicatorsTs) {
         }});
 }
 function updatePlotIndicators(timestep) {
+    var opinions = getOpinions(timestep);
     // find where the data should be inserted in the timeseries
     var insertionIndex = indicatorsRange.findIndex(function (x) {
         return x > timestep;
@@ -158,18 +164,18 @@ function updatePlotIndicators(timestep) {
         // indicators for this timestep have been already computed, so passing
         return;
     }
-    var clusters = getClusters(timestep, 0.01);
+    var clusters = getClusters(opinions, 0.01);
     indicatorsTs.nbIsolatedInd.splice(insertionIndex, 0, clusters[0]);
     indicatorsTs.nbClusters.splice(insertionIndex, 0, clusters[1].length);
-    indicatorsTs.opAvg0.splice(insertionIndex, 0, getOpAvg(timestep, 0));
-    indicatorsTs.opAvg1.splice(insertionIndex, 0, getOpAvg(timestep, 1));
+    indicatorsTs.opAvg0.splice(insertionIndex, 0, getOpAvg(opinions, 0));
+    indicatorsTs.opAvg1.splice(insertionIndex, 0, getOpAvg(opinions, 1));
     indicatorsRange.splice(insertionIndex, 0, timestep);
     plotsToRefresh = timestep;
 }
-function getOpAvg(timestep, subj) {
-    return opinionsTs[timestep][subj].reduce(function (prev, cur) {
+function getOpAvg(opinions, subj) {
+    return opinions[subj].reduce(function (prev, cur) {
         return prev + Math.abs(cur);
-    }, 0) / opinionsTs[timestep][subj].length;
+    }, 0) / opinions[subj].length;
 }
 /**
  * Creates a new array with all elements that pass the test implemented
@@ -187,12 +193,11 @@ Array.prototype.filterAndRemove = function (filter) {
     }
     return result;
 };
-function getClusters(timestep, epsilon) {
+function getClusters(opinions, epsilon) {
     // gathering index of moderate individuals
-    var todo = range(opinionsTs[timestep][0].length).filter(function (indIndex) {
+    var todo = range(opinions[0].length).filter(function (indIndex) {
         return extremistId.indexOf(indIndex) < 0;
     });
-    var opinions = opinionsTs[timestep];
     var clusters = [];
     var nbIsolatedIndividuals = 0;
     while (todo.length > 0) {
