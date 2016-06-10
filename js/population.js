@@ -251,10 +251,9 @@ Population.prototype.iter = function (iteration) {
  * autres situations, y compris sur proche sur une seule dimension
  */
 Population.prototype.discussionMouvBC2DSimple = function (a, b, objet) {
-    var mouvAvgDim = arrayFilled(this.parameters.nbSubjBelief, 0.0);
     // Interaction mode: 1 means increase closeness; -1 means rejection (increase farness)
-    var dist = arrayFilled(this.parameters.nbSubjBelief, 0);
-    var distInter = arrayFilled(this.parameters.nbSubjBelief, 0); // distance réel inter individus
+    var dist =  new Array(this.parameters.nbSubjBelief);
+    var distInter = new Array(this.parameters.nbSubjBelief); // distance réel inter individus
     for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
         distInter[i] = Math.abs(a.sBavg[objet][i] - b.sBavg[objet][i]);
         dist[i] = -(distInter[i] - b.sBunc[objet][i]);
@@ -262,10 +261,14 @@ Population.prototype.discussionMouvBC2DSimple = function (a, b, objet) {
         // if distance is positive, then there is a common opinion part
     }
     if (dist.every(elt => elt > 0.0)) {
+        var mouvAvgDim = new Array(this.parameters.nbSubjBelief);
         // then attraction on both dimensions
         for (i = 0; i < this.parameters.nbSubjBelief; i++) {
             mouvAvgDim[i] = this.onlyAttraction(a, b, dist[i], objet, i, distInter[i]); // attraction seule possible
         }
+        return mouvAvgDim;
+    } else {
+        return arrayFilled(this.parameters.nbSubjBelief, 0.0);
     }
     return mouvAvgDim;
 };
@@ -340,12 +343,12 @@ Population.prototype.influenceAvg = function (a, b, objet, belief) {
  * and b based on Wood et al 1996
  */
 Population.prototype.discussionMouvARHierarchise = function (a, b, objet) {
-    var mouvAvgDim = arrayFilled(this.parameters.nbSubjBelief, 0.0);
+    var mouvAvgDim = new Array(this.parameters.nbSubjBelief);
     // self relevance of positive dimension (smaller it is more relevant it is)
     var selfRelevancePos = 0.0;
     // self relevance of negative dimension
     var selfRelevanceNeg = 0.0;
-    var dist = arrayFilled(this.parameters.nbSubjBelief, 0);
+    var dist = new Array(this.parameters.nbSubjBelief);
     for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
         dist[i] = -(Math.abs(a.sBavg[objet][i] - b.sBavg[objet][i]) - b.sBunc[objet][i]);
         // if distance is negative, no common opinion part
@@ -369,6 +372,8 @@ Population.prototype.discussionMouvARHierarchise = function (a, b, objet) {
         for (var i = 0; i < this.parameters.nbSubjBelief; i++) {
             if (dist[i] >= 0) {
                 mouvAvgDim[i] = -b.mu[i] * this.influenceAvg(a, b, objet, i); //rejet car loin sur 0 et proche sur 1
+            } else {
+                mouvAvgDim[i] = 0.0;
             }
         }
     }
