@@ -261,7 +261,7 @@ Population.prototype.discussionMouvBC2DSimple = function (a, b, objet) {
         // if distance is negative, no common opinion part
         // if distance is positive, then there is a common opinion part
     }
-    if (dist[0] > 0.0 && dist[1] > 0.0) {
+    if (dist.every(elt => elt > 0.0)) {
         // then attraction on both dimensions
         for (i = 0; i < this.parameters.nbSubjBelief; i++) {
             mouvAvgDim[i] = this.onlyAttraction(a, b, dist[i], objet, i, distInter[i]); // attraction seule possible
