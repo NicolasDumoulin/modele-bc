@@ -1,5 +1,5 @@
 function arrayFilled(size, value) {
-    return Array.apply(null, new Array(size)).map(Number.prototype.valueOf, value);
+    return new Array(size).fill(value);
 }
 function matrix(size1, size2, value) {
     var x = new Array(size1);
