@@ -52,9 +52,9 @@ function plotOpinions(step) {
             mode: 'markers',
             name: 'points',
             marker: {
-                color: 'rgb(0,102,0)',
-                size: 3,
-                opacity: 0.5
+                color: 'rgb(19,172,19)',
+                size: 4,
+                opacity: 0.9
             },
             type: 'scatter'
         }, {
