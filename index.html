@@ -254,28 +254,33 @@
             <script type="text/javascript">
                 var references = {
                     "Huet2010":{ cite: "Huet and Deffuant, 2010", text: "Huet, S., & Deffuant, G. (2010). Openness leads to opinion stability and narrowness to volatility. Advances in Complex Systems, 13(3), 405-423.", link: "http://motive.cemagref.fr/_publication/PUB00029104.pdf"},
-"Deffuant2006":{ cite:"Deffuant, 2006", text: "Deffuant, G. (2006). Comparing Extremism Propagation in Continuous Opinion Models. Journal of Artificial Societies and Social Simulation, 9(3)."},
-"Deffuant2007":{cite:"Deffuant and Huet, 2007", text: "Deffuant, G., & Huet, S. (2007). Propagation effects of filtering incongruent information. Journal of Business Research, 60(8), 816-825. "},
-"Deffuant2001":{cite: "Deffuant et al., 2001", text: "Deffuant, G., Neau, D., Amblard, F., & Weisbuch, G. (2001). Mixing beliefs among interacting agents. Advances in Complex Systems(3), 87-98. "},
-"Festinger1954":{cite: "Festinger, 1954", text: "Festinger, L. (1954). A theory of social comparison processes. Human Relations, 7(2), 117-140."},
-"Hegselmann2002":{cite: "Hegselmann and Krause, 2002", text: "Hegselmann, R., & Krause, U. (2002). Opinion Dynamics and Bounded Confidence Models, Analysis and Simulation. Journal of Artificial Societies and Social Simulation, 5(3)."},
-"Krause2000": {cite: "Krause, 2000", text: "Krause, U. (2000). A Discrete Nonlinear and Non-Autonomous Model of Consensus Formation. In S. Elyadi, G. Ladas, J. Popenda & J. Rakowski (Eds.), Communications in Difference Equations (pp. 227-236). Amsterdam: Gordon and Breach Pub."},
-"Mathias2016": {cite: "Mathias et al., 2016", text: "Mathias, J.-D., Huet, S., & Deffuant, G. (2016). Bounded Confidence Model with Fixed Uncertainties and Extremists: The Opinions Can Keep Fluctuating Indefinitely. Journal of Artificial Societies and Social Simulation, 19(1), 6. doi: 10.18564/jasss.2967"},
+"Deffuant2006":{ cite:"Deffuant, 2006", text: "Deffuant, G. (2006). Comparing Extremism Propagation in Continuous Opinion Models. Journal of Artificial Societies and Social Simulation, 9(3).", link:"http://jasss.soc.surrey.ac.uk/9/3/8.html"},
+"Deffuant2007":{cite:"Deffuant and Huet, 2007", text: "Deffuant, G., & Huet, S. (2007). Propagation effects of filtering incongruent information. Journal of Business Research, 60(8), 816-825.", link:"http://www.sciencedirect.com/science/article/pii/S0148296307000380"},
+"Deffuant2001":{cite: "Deffuant et al., 2001", text: "Deffuant, G., Neau, D., Amblard, F., & Weisbuch, G. (2001). Mixing beliefs among interacting agents. Advances in Complex Systems(3), 87-98. ", link:"http://wwwlisc.clermont.cemagref.fr/imagesproject/finalreport/mixbel.pdf"},
+"Festinger1954":{cite: "Festinger, 1954", text: "Festinger, L. (1954). A theory of social comparison processes. Human Relations, 7(2), 117-140.", link:"https://www.humanscience.org/docs/Festinger%20(1954)%20A%20Theory%20of%20Social%20Comparison%20Processes.pdf"},
+"Hegselmann2002":{cite: "Hegselmann and Krause, 2002", text: "Hegselmann, R., & Krause, U. (2002). Opinion Dynamics and Bounded Confidence Models, Analysis and Simulation. Journal of Artificial Societies and Social Simulation, 5(3).", link:"http://jasss.soc.surrey.ac.uk/5/3/2/2.pdf"},
+"Krause2000": {cite: "Krause, 2000", text: "Krause, U. (2000). A Discrete Nonlinear and Non-Autonomous Model of Consensus Formation. In S. Elyadi, G. Ladas, J. Popenda & J. Rakowski (Eds.), Communications in Difference Equations (pp. 227-236). Amsterdam: Gordon and Breach Pub.", link:"http://www.crcnetbase.com/doi/abs/10.1201/b16999-21"},
+"Mathias2016": {cite: "Mathias et al., 2016", text: "Mathias, J.-D., Huet, S., & Deffuant, G. (2016). Bounded Confidence Model with Fixed Uncertainties and Extremists: The Opinions Can Keep Fluctuating Indefinitely. Journal of Artificial Societies and Social Simulation, 19(1), 6. doi: 10.18564/jasss.2967", link:"http://jasss.soc.surrey.ac.uk/19/1/6.html"},
 "Sherif1961": {cite: "Sherif and Hovland, 1961", text:"Sherif, M., & Hovland, C. I. (1961). Social Judgment. Assimilation and contrast effects. Communication and attitude change: New Haven and London: Yale University Press."},
-"Weisbuch2002": {cite: "Weisbuch et al., 2002", text:"Weisbuch, G., Deffuant, G., Amblard, F., & Nadal, J. P. (2002). Meet, discuss and segregate ! Complexity, 7(3), 55-63."},
+"Weisbuch2002": {cite: "Weisbuch et al., 2002", text:"Weisbuch, G., Deffuant, G., Amblard, F., & Nadal, J. P. (2002). Meet, discuss and segregate ! Complexity, 7(3), 55-63.",link:"http://simsoc.free.fr/ressources/articles/2002/WeisbuchDeffuantAmblardNadalComplexity2002.pdf"},
 "Wood1996": {cite: "Wood et al., 1996", text: "Wood, W., Pool, G. J., Leck, K., & Purvis, D. (1996). Self-definition, defensive processing, and influence: the normative impact of majority and minority groups. Journal of Personality and Social Psychology(71), 1181-1193."}             
                 };
                 $("#documentation .bib").each(function(e){
                     var ref = references[$(this).attr('bib')];
                     //console.log($(this).attr('bib'), ref);
-                    $(this).attr('title', ref.text);
                     $(this).text(ref.cite);
-                    $(this).tooltip({delay: {hide:600}});
+                    if ('link' in ref) {
+                        $(this).attr('title', '<p>'+ref.text+'</p><p><a href="'+ref.link+'" target="_blank">Read online</a></p>');
+                        $(this).tooltip({html:true, delay: {hide:600}});                        
+                    } else {
+                        $(this).attr('title', ref.text);
+                        $(this).tooltip({delay: {hide:600}});
+                    }
                 });
                 var referencesList=$('#references');
-                $.each(references, function(i, e){
+                $.each(references, function(i, ref){
                     //console.log(e);
-                    referencesList.append('<dt>'+e.cite+'</dt><dd>'+e.text+'</dd>');
+                    referencesList.append('<dt>'+ref.cite+'</dt><dd>'+ref.text+' <a href="'+ref.link+'" target="_blank">Read online</a></dd>');
                 });
             </script>
             <div id="about" class="container">
