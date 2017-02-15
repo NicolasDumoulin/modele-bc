@@ -381,6 +381,70 @@
                 itSliderMax.text(stopIteration);
                 updatePermalink();
             }
+            function storeInit() {
+                var x = new Array(pop.parameters.taille);
+                var y = new Array(pop.parameters.taille);
+                var ids = [];
+                for (var i = 0; i < pop.parameters.taille; i++) {
+                    x[i] = pop.population[i].sBavg[0][0];
+                    y[i] = pop.population[i].sBavg[0][1];
+                    if (pop.population[i].isExtremist()) {
+                        ids.push(i);
+                    }
+                }
+                opinionsTs.push([x, y]);
+                extremistId.push(ids);
+            }
+            function storeStep() {
+                var x = new Array();
+                var y = new Array();
+                var xHighlyEngaged = new Array();
+                var yHighlyEngaged = new Array();
+                for (var i = 0; i < pop.parameters.taille; i++) {
+                    if (pop.population[i].isHighlyEngaged()) {
+                        xHighlyEngaged.push(pop.population[i].sBavg[0][0]);
+                        yHighlyEngaged.push(pop.population[i].sBavg[0][1]);
+                    } else {
+                        x.push(pop.population[i].sBavg[0][0]);
+                        y.push(pop.population[i].sBavg[0][1]);
+                    }
+                }
+                // overriding last data in timeserie until we reach the next timeserieStep
+                opinionsTs[Math.ceil(iteration / timeserieStep)] = [x, y, xHighlyEngaged, yHighlyEngaged];
+            }
+            function simulationTest(nbSteps, store) {
+                var startTime = new Date();
+                pop = new Population(
+                                parseInt($('#args-popsize').val(), 10),
+                                parseFloat($('#args-pe').val(), 10),
+                                parseFloat($('#args-eip').val(), 10),
+                                [parseFloat($('#args-mu0').val(), 10), parseFloat($('#args-mu1').val(), 10)],
+                                [parseFloat($('#args-u0').val(), 10), parseFloat($('#args-u1').val(), 10)]
+                                );
+                if (store) {
+                    storeInit();
+                }
+                for (var i = 0;i<nbSteps;i++){
+                    pop.iter(i);
+                    if (store) {
+                        storeStep();
+                    }
+                }
+                var endTime = new Date();
+                return (endTime - startTime)/1000;
+            }
+            function benchmark() {
+                simulationTimes = [];
+                simulationStoredTimes = [];
+                for (var r=0;r<2;r++){
+                    console.log('simulation');
+                    //simulationTimes.push(simulationTest(200, false));
+                    console.log('simulation stored');
+                    simulationStoredTimes.push(simulationTest(1000, true));
+                }
+                console.log(simulationTimes);
+                console.log(simulationStoredTimes);
+            }
             function simulation() {
                 if (simulationRun) {
                     if (opinionsTs.length === 0) {
@@ -483,6 +547,10 @@
                 paused = true;
             }
             playBtn.click(function () {  
+                /*$('#play-btn span').removeClass('glyphicon-play');
+                benchmark();
+                $('#play-btn span').addClass('glyphicon-play');
+                return;*/
                 if (simulationRun) {
                     pause();
                     updatePlotIndicators(iteration);
