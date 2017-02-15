@@ -10,6 +10,55 @@
         <script type="text/javascript" src="js/bootstrap-3.3.6.min.js"></script>
     </head>
     <body>
+        <script type="text/javascript">
+            /**
+             * Fill a table with given parameters and add a button for using
+             *  these parameters in the simulator.
+             * @param {type} tableID
+             * @param {type} data
+             * @returns {undefined}
+             */
+            function add_presets(tableID, data) {
+                var table=document.querySelector("#"+tableID+" tbody");
+                // adding header
+                data = [["Configuration name", "Part of extremist on each dimension", "Part of highly self-engaged in dimension 1", "mu dimension 1", "mu dimension 2", "uncertainty on dimesion 1", "uncertainty on dimesion 2"]].concat(data);
+                //Converting rows to columns
+                var r = data[0].map(function(col, i) {
+                    return data.map(function(row) {
+                        return row[i];
+                    });
+                });
+                // filling array
+                r.forEach(function (row) {
+                    var tr = '<tr>';
+                    row.forEach(function (cell, i) {
+                        if (i === 0) {
+                            tr += '<th scope="row">' + cell + '</th>';
+                        } else {
+                            tr += '<td>' + cell + '</td>';
+                        }
+                    });
+                    table.innerHTML += tr + '</tr>';
+                });
+                // adding buttons
+                var row = '<tr>';
+                data.forEach(function (elt, i) {
+                    if (i === 0) {
+                        row += '<th scope="row">Click for using these parameters</th>';
+                    } else {
+                        var slug = elt[0].replace(/[^a-z0-9-]/gi, '-');
+                        var id = "parameters" + slug;
+                        row += '<td><button id="' + id + '" type="button" class="btn btn-primary">' + elt[0] + '</button></td>';
+                        $("#documentation").on("click", "button#" + id, function (clickEvent) {
+                            clickEvent.preventDefault();
+                            setParametersInForm.apply(this, elt.slice(1));
+                            $('html, body').animate({scrollTop: $('#simulator').position().top}, 500);
+                        });
+                    }
+                });
+                table.innerHTML += row + '</tr>';
+            }
+        </script>
         <div class="modal fade" id="confirm-stop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog"><div class="modal-content">
                     <div class="modal-header"><h4 class="modal-title" id="myModalLabel">Confirmation</h4></div>
@@ -20,22 +69,15 @@
                     </div>
                 </div>
             </div>
-        </div>                
+        </div>                              
         <div class="container">
-            <div class="jumbotron">
+            <div class="jumbotron text-center">
                 <h1>Various Bounded Confidence</h1>
-                <p class="lead">Discover the dynamics of bounded confidence models<!-- described in
-                    <a href="http://jasss.soc.surrey.ac.uk/19/1/6.html" title="Mathias, Jean-Denis, Huet, Sylvie and Deffuant, Guillaume (2016) 'Bounded Confidence Model with Fixed Uncertainties and Extremists: The Opinions Can Keep Fluctuating Indefinitely' Journal of Artificial Societies and Social Simulation 19 (1) 6">(Deffuant et al., 2016)</a-->
-                </p>
+                <p class="lead">Discover the dynamics of bounded confidence models</p>
+                <button id="btnNavPlay" type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span> Play</button>
+                <button id="btnNavLearn" type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-education" aria-hidden="true"></span> Learn</button>
+                <button id="btnNavAbout" type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> About</button>
             </div>
-            <!--div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Help</h3>
-                </div>
-                <div class="panel-body">
-                    
-                </div>
-            </div-->
             <div id="simulator">
                 <div class="input-group col-sm-12">
                     <label id="play-btn" class="btn btn-default input-group-addon"><span class="glyphicon glyphicon-play"></span></label>
@@ -82,12 +124,6 @@
                     <div role="tabpanel" class="tab-pane active" id="config">
                         <form class="form-horizontal" role="form">
                             <div class="form-group">
-                                <label for="args-popsize"  class="col-sm-4">Pop size</label>
-                                <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="args-popsize">
-                                </div>
-                            </div>
-                            <div class="form-group">
                                 <label for="args-pe"  class="col-sm-4">Part of extremist on each dimension</label>
                                 <div class="col-sm-4">
                                     <input type="number" class="form-control" id="args-pe" step="0.1" min="0" max="1">
@@ -124,6 +160,12 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label for="args-popsize"  class="col-sm-4">Pop size</label>
+                                <div class="col-sm-4">
+                                    <input type="number" class="form-control" id="args-popsize">
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="args-nbSteps" class="col-sm-4">Nb steps to run</label>
                                 <div class="col-sm-4">
                                     <input type="number" class="form-control" id="args-nbSteps">
@@ -147,6 +189,108 @@
                         <div class="col-lg-6" id="plot-opinions"></div>
                         <div class="col-lg-6" id="plot-indicators"></div>
                     </div>
+                </div>
+            </div>
+            <div id="documentation">
+                <h2><span class="glyphicon glyphicon-education" aria-hidden="true"></span> How it works?</h2>
+                <p>We consider here one of the most popular continuous opinion models, the bounded confidence (BC) model (<abbr class="bib" bib="Deffuant2007"></abbr> ; <abbr class="bib" bib="Deffuant2001"></abbr> ; <abbr class="bib" bib="Weisbuch2002"></abbr>) (also proposed by (<abbr class="bib" bib="Hegselmann2002"></abbr> ; <abbr class="bib" bib="Krause2000"></abbr>) with a different communication regime). Its principles are very close to the theory of social comparison(<abbr class="bib" bib="Festinger1954"></abbr>) and to social judgment theory(<abbr class="bib" bib="Sherif1961"></abbr>). The agents are characterized by an initial opinion (generally supposed to be between -1 and 1 as in the present study, or between 0 and 1) and a threshold that can be interpreted as an uncertainty around this opinion.</p>
+                <h3>The basic dynamic</h3>
+                <p>The dynamics presented on this page (<abbr class="bib" bib="Deffuant2001"></abbr>) picks random pairs of agents that influence each other by slightly moving their opinions towards each other, but only if the distance between their opinions is lower than the uncertainty. When all the agents share the same uncertainty (on the one or on the two as presented here opinion dimensions), the opinions progressively converge to a set of opinion clusters, with all agents of a cluster sharing the same opinion and with an increasing number of clusters when the uncertainty decreases.</p>
+                <table id="table1" class="table table-hover">
+                    <tbody></tbody>
+                </table>
+                <script type="text/javascript">
+                    add_presets("table1", [
+                        ["4 clusters", 0, 0, 0.5, 0.5, 0.4, 0.4],
+                        ["26 clusters", 0, 0, 0.5, 0.5, 0.8, 0.8],
+                        ["1 cluster", 0, 0, 0.5, 0.5, 0.3, 0.1]
+                    ]);
+                </script>
+                <h3>Adding extremists (with extreme opinions and very low uncertainties)</h3>
+                <p>With variants of this model, (<abbr class="bib" bib="Deffuant2006"></abbr> ; <abbr class="bib" bib="Mathias2016"></abbr>) study the impact of extremists on moderate agents. The extremists are initialized with extreme opinions (+1 or -1) and all share the same small uncertainty, whereas the moderates are initialized with an opinion uniformly drawn between -1 and +1 and the same larger uncertainty. By construction of the model, the extremists are more influential and less likely to change their opinions and uncertainties. Only for (<abbr class="bib" bib="Deffuant2006"></abbr>), both opinions and uncertainties are modified during interactions (only for(<abbr class="bib" bib="Deffuant2006"></abbr> ; <abbr class="bib" bib="Mathias2016"></abbr>)). The extremists tend to reduce the uncertainty of the moderates during interactions. This latter model is not presented here. For <abbr class="bib" bib="Mathias2016"></abbr>, the uncertainties remain constant. For a low uncertainty of moderates or a very small part of extremists, the model is equivalent to the basic dynamic.</p>
+                <p>For the other values, depending on the initial number of extremists and the initial uncertainty of the moderates, three convergence types appear: central clusters, double extreme clusters, single extreme cluster.(<abbr class="bib" bib="Mathias2016"></abbr>) exhibit a new stationary state appears when the uncertainties are fixed, for large uncertainties of the moderates. In this stationary state, the opinions of moderate agents keep fluctuating without clustering, altogether forming a stable density which shape changes significantly when the parameters vary (called here metastable state).</p>
+                <!--table id="table2" class="table table-hover">
+                    <tbody></tbody>
+                </table>
+                <script type="text/javascript">
+                    add_presets("table2", [
+
+                    ]);
+                </script-->
+                <table id="table3" class="table table-hover table-condensed">
+                    <tbody></tbody>
+                </table>
+                <script type="text/javascript">
+                    add_presets("table3", [
+                        ["Simple extreme", 0.3, 0, 0.5, 0.5, 0.8, 0.8],
+                        ["Central convergence", 0.6, 0, 0.5, 0.5, 0.8, 0.8],
+                        ["Double extreme", 0.6, 0, 0.5, 0.5, 1, 1],
+                        ["Double extreme metastable", 0.6, 0, 0.5, 0.5, 1.2, 1.2],
+                        ["Double extreme metastable and then single", 0.2, 0, 0.5, 0.5, 1.2, 1.2],
+                        ["Moderate metastable", 0.05, 0, 0.5, 0.5, 1.2, 1.2]
+                    ]);
+                </script>
+
+                <h3>Adding negative influence for self-engaged agents</h3>
+                <p>Instead of adding extremists in their initial population, (<abbr class="bib" bib="Huet2010"></abbr>) study dynamics including a negative influence which can also lead to the emergence of polarization and extremism. They have proposed a modelling inspired from a set of experiments (<abbr class="bib" bib="Wood1996"></abbr>). These experiments show that highly self-engaged people in one group (ie considering it as highly self-relevant) have a different dynamics from other people: they are attracted without any conditions by members of their own group whatever the issue is and reject opinion on secondary issue if emitted by someone from another group. In the current program, we consider the dimension defining group membership in on abscissa while secondary issue are discussed on ordinate. One can notice that the presence of such agents in the population simplify the space, leading to less clusters, and can be responsible for cohesion as well polarisation.</p>
+                <table id="table4" class="table table-hover table-condensed">
+                    <tbody></tbody>
+                </table>
+                <script type="text/javascript">
+                    add_presets("table4", [
+                        ["26 clusters", 0, 0, 0.5, 0.5, 0.3, 0.1],
+                        ["3 clusters", 0, 1, 0.5, 0.5, 0.3, 0.1],
+                        ["9 clusters - polarisation", 0, 1, 0.5, 0.5, 0.1, 0.3],
+                        ["9/10 clusters - polarisation", 0, 1, 0.5, 0.5, 0.3, 0.5],
+                        ["8 clusters - polarisation", 0, 1, 0.5, 0.5, 0.1, 1.1]
+                    ]);
+                </script>
+
+                <h3>References</h3>
+                <dl id="references">
+                </dl>
+            </p>
+            </div>    
+            <script type="text/javascript">
+                var references = {
+                    "Huet2010":{ cite: "Huet and Deffuant, 2010", text: "Huet, S., & Deffuant, G. (2010). Openness leads to opinion stability and narrowness to volatility. Advances in Complex Systems, 13(3), 405-423.", link: "http://motive.cemagref.fr/_publication/PUB00029104.pdf"},
+"Deffuant2006":{ cite:"Deffuant, 2006", text: "Deffuant, G. (2006). Comparing Extremism Propagation in Continuous Opinion Models. Journal of Artificial Societies and Social Simulation, 9(3)."},
+"Deffuant2007":{cite:"Deffuant and Huet, 2007", text: "Deffuant, G., & Huet, S. (2007). Propagation effects of filtering incongruent information. Journal of Business Research, 60(8), 816-825. "},
+"Deffuant2001":{cite: "Deffuant et al., 2001", text: "Deffuant, G., Neau, D., Amblard, F., & Weisbuch, G. (2001). Mixing beliefs among interacting agents. Advances in Complex Systems(3), 87-98. "},
+"Festinger1954":{cite: "Festinger, 1954", text: "Festinger, L. (1954). A theory of social comparison processes. Human Relations, 7(2), 117-140."},
+"Hegselmann2002":{cite: "Hegselmann and Krause, 2002", text: "Hegselmann, R., & Krause, U. (2002). Opinion Dynamics and Bounded Confidence Models, Analysis and Simulation. Journal of Artificial Societies and Social Simulation, 5(3)."},
+"Krause2000": {cite: "Krause, 2000", text: "Krause, U. (2000). A Discrete Nonlinear and Non-Autonomous Model of Consensus Formation. In S. Elyadi, G. Ladas, J. Popenda & J. Rakowski (Eds.), Communications in Difference Equations (pp. 227-236). Amsterdam: Gordon and Breach Pub."},
+"Mathias2016": {cite: "Mathias et al., 2016", text: "Mathias, J.-D., Huet, S., & Deffuant, G. (2016). Bounded Confidence Model with Fixed Uncertainties and Extremists: The Opinions Can Keep Fluctuating Indefinitely. Journal of Artificial Societies and Social Simulation, 19(1), 6. doi: 10.18564/jasss.2967"},
+"Sherif1961": {cite: "Sherif and Hovland, 1961", text:"Sherif, M., & Hovland, C. I. (1961). Social Judgment. Assimilation and contrast effects. Communication and attitude change: New Haven and London: Yale University Press."},
+"Weisbuch2002": {cite: "Weisbuch et al., 2002", text:"Weisbuch, G., Deffuant, G., Amblard, F., & Nadal, J. P. (2002). Meet, discuss and segregate ! Complexity, 7(3), 55-63."},
+"Wood1996": {cite: "Wood et al., 1996", text: "Wood, W., Pool, G. J., Leck, K., & Purvis, D. (1996). Self-definition, defensive processing, and influence: the normative impact of majority and minority groups. Journal of Personality and Social Psychology(71), 1181-1193."}             
+                };
+                $("#documentation .bib").each(function(e){
+                    var ref = references[$(this).attr('bib')];
+                    //console.log($(this).attr('bib'), ref);
+                    $(this).attr('title', ref.text);
+                    $(this).text(ref.cite);
+                    $(this).tooltip({delay: {hide:600}});
+                });
+                var referencesList=$('#references');
+                $.each(references, function(i, e){
+                    //console.log(e);
+                    referencesList.append('<dt>'+e.cite+'</dt><dd>'+e.text+'</dd>');
+                });
+            </script>
+            <div id="about" class="container">
+                <h2><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> About this application</h2>
+                <div class="row">
+                    <div class="col-xs-2">
+                        <img class="pull-left img-responsive" src="logo_irstea.jpg">
+                    </div>
+                    <div class="col-xs-8">
+                        <p>This application has been produced by the <a href="http://motive.cemagref.fr/lisc/presentation">Laboratory of Engineering for Complex Systems</a> at the french institute <a href="http://www.irstea.fr/accueil">Irstea</a>. The main author is <a href="mailto:nicolas.dumoulin@irstea.fr">Nicolas Dumoulin</a>, please feel free to contact him if you have any question about technical aspects of this webpage.</p>
+                        <p>The source code of this webpage is <a href="https://github.com/NicolasDumoulin/modele-bc">available</a> under the <a href="http://www.gnu.org/licenses/gpl.html">GNU Public License</a>.</p>
+                    </div>
+                    <a href="#top" class="well well-sm"  onclick="$('html,body').animate({scrollTop:0},'slow');return false;">
+        <i class="glyphicon glyphicon-chevron-up"></i> Back to Top
+    </a>
                 </div>
             </div>
         </div>
@@ -199,6 +343,24 @@
                 // force slider update
                 $('#args-nbSteps').trigger("input");
             }
+            function setParametersInForm(pe, eip, mu0, mu1, u0, u1) {
+                $('#args-pe').val(pe);
+                $('#args-eip').val(eip);
+                $('#args-mu0').val(mu0);
+                $('#args-mu1').val(mu1);
+                $('#args-u0').val(u0);
+                $('#args-u1').val(u1);
+                // force slider update
+                $('#args-nbSteps').trigger("input");
+            }
+            $('#parametersBasic').click(function(e) {
+                e.preventDefault();
+                setParametersInForm(0,0,0.5,0.5,0.3,0.1);
+            });
+            $('#parametersExtremists').click(function(e) {
+                e.preventDefault();
+                setParametersInForm(0.8,0,0.5,0.5,0.4,0.4);
+            });
             function initSimulation() {
                 $('#plot-opinions').empty();
                 $('#plot-indicators').empty();
@@ -302,6 +464,15 @@
             var itSliderMax = $("#iterationSlider-max");
             var itSliderVal = $("#iterationSlider-val");
             // Controls events
+            $('#btnNavPlay').click(function(){
+                $('html, body').animate({scrollTop: $('#simulator').position().top}, 500);
+            });
+            $('#btnNavLearn').click(function(){
+                $('html, body').animate({scrollTop: $('#documentation').position().top}, 500);
+            });
+            $('#btnNavAbout').click(function(){
+                $('html, body').animate({scrollTop: $('#about').position().top}, 500);
+            });
             $('#config input').on('change', function () {
                 updatePermalink();
             });
@@ -311,7 +482,7 @@
                 simulationRun = false;
                 paused = true;
             }
-            playBtn.click(function () {
+            playBtn.click(function () {  
                 if (simulationRun) {
                     pause();
                     updatePlotIndicators(iteration);
