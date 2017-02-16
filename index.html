@@ -9,12 +9,32 @@
         <script type="text/javascript" src="js/plots.js"></script>
         <script type="text/javascript" src="js/jquery-2.2.0.min.js"></script>
         <script type="text/javascript" src="js/bootstrap-3.3.6.min.js"></script>
+        <script src="js/jquery.color-2.1.2.min.js"></script>
         <style type="text/css">
             body { margin-bottom: 60px; }
         </style>
     </head>
     <body>
         <script type="text/javascript">
+            // 'presets' contains all the parameters presets indexed by their id.
+            // each preset is an array containing first the name of the preset and then the parameter values
+            var presets = {};
+            function updatePresetRecall(presetName) {
+                if ($('#presetRecall').attr('presetName') !== presetName) {
+                    if (presetName.length>0) {
+                        $('#presetRecall').text("Current preset: "+presetName);
+                        $("#presetRecall").delay(500).animate({ backgroundColor: "#d9edf7" }, 1500 );
+                        $("#presetRecall").delay(2000).animate({ backgroundColor: "#FFFFFF" }, 500 );
+                    } else {
+                        $('#presetRecall').html("<b>Leaving</b> preset: "+$('#presetRecall').attr('presetName')+" (parameters modified)");
+                        $("#presetRecall").animate({ backgroundColor: "#f2dede" }, 500 );
+                        $("#presetRecall").delay(3000).animate({ backgroundColor: "#FFFFFF" }, 1500 );
+                        setTimeout( function(){ $('#presetRecall').text(''); }, 5000 );
+                    }
+                    $('#presetRecall').attr('presetName', presetName);
+                }
+                //setTimeout( function(){ $('#presetRecall').removeClass("alert-info"); }, 4500 );
+            }
             /**
              * Fill a table with given parameters and add a button for using
              *  these parameters in the simulator.
@@ -51,12 +71,14 @@
                         row += '<th scope="row">Click for using these parameters</th>';
                     } else {
                         var slug = elt[0].replace(/[^a-z0-9-]/gi, '-');
+                        presets[slug] = elt;
                         var id = "parameters" + slug;
                         row += '<td><button id="' + id + '" type="button" class="btn btn-primary">' + elt[0] + '</button></td>';
                         $("#documentation").on("click", "button#" + id, function (clickEvent) {
                             clickEvent.preventDefault();
                             setParametersInForm.apply(this, elt.slice(1));
                             $('html, body').animate({scrollTop: $('#simulator').position().top}, 500);
+                            updatePresetRecall(elt[0]);
                         });
                     }
                 });
@@ -122,6 +144,7 @@
                        type="button" title="Permalink to current parameters, for sharing or bookmarking your experiment."></a>
                     <button id="resetParameters" href="" class="btn glyphicon glyphicon-trash"
                             type="button" title="Reset to default parameters."></button>
+                    <span id="presetRecall" role="alert" class="alert" style="margin-left:5px;"></span>
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
@@ -218,7 +241,6 @@
                 </table>
                 <script type="text/javascript">
                     add_presets("table2", [
-
                     ]);
                 </script-->
                 <table id="table3" class="table table-hover table-condensed">
@@ -555,6 +577,9 @@
             });
             $('#config input').on('change', function () {
                 updatePermalink();
+                if (['args-nbSteps','args-popsize'].indexOf($(this).attr('id'))<0) {
+                    updatePresetRecall('');
+                }
             });
             function pause() {
                 $('#play-btn span').removeClass('glyphicon-pause');
