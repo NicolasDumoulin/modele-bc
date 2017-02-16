@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Various Bounded Confidence</title>
+        <meta charset="UTF-8">
         <link href="css/bootstrap-3.3.6.min.css" rel="stylesheet">
         <script type="text/javascript"  src="js/plotly-latest.min.js"></script>
         <script type="text/javascript" src="js/population.js"></script>
@@ -24,7 +25,7 @@
             function add_presets(tableID, data) {
                 var table=document.querySelector("#"+tableID+" tbody");
                 // adding header
-                data = [["Configuration name", "Part of extremist on each dimension", "Part of highly self-engaged in dimension 1", "mu dimension 1", "mu dimension 2", "uncertainty on dimesion 1", "uncertainty on dimesion 2"]].concat(data);
+                data = [["Configuration name", "Part of extremist on each dimension", "Part of highly self-engaged in dimension 1", "mu dimension 1", "mu dimension 2", "uncertainty on dimension 1", "uncertainty on dimension 2"]].concat(data);
                 //Converting rows to columns
                 var r = data[0].map(function(col, i) {
                     return data.map(function(row) {
@@ -196,7 +197,7 @@
             </div>
             <div id="documentation">
                 <h2><span class="glyphicon glyphicon-education" aria-hidden="true"></span> How it works?</h2>
-                <p>We consider here one of the most popular continuous opinion models, the bounded confidence (BC) model (<abbr class="bib" bib="Deffuant2007"></abbr> ; <abbr class="bib" bib="Deffuant2001"></abbr> ; <abbr class="bib" bib="Weisbuch2002"></abbr>) (also proposed by (<abbr class="bib" bib="Hegselmann2002"></abbr> ; <abbr class="bib" bib="Krause2000"></abbr>) with a different communication regime). Its principles are very close to the theory of social comparison(<abbr class="bib" bib="Festinger1954"></abbr>) and to social judgment theory(<abbr class="bib" bib="Sherif1961"></abbr>). The agents are characterized by an initial opinion (generally supposed to be between -1 and 1 as in the present study, or between 0 and 1) and a threshold that can be interpreted as an uncertainty around this opinion.</p>
+                <p>We consider here one of the most popular continuous opinion models, the bounded confidence (BC) model (<abbr class="bib" bib="Huet2008"></abbr> ; <abbr class="bib" bib="Deffuant2001"></abbr> ; <abbr class="bib" bib="Weisbuch2002"></abbr>) (also proposed by (<abbr class="bib" bib="Hegselmann2002"></abbr> ; <abbr class="bib" bib="Krause2000"></abbr>) with a different communication regime). Its principles are very close to the theory of social comparison(<abbr class="bib" bib="Festinger1954"></abbr>) and to social judgment theory(<abbr class="bib" bib="Sherif1961"></abbr>). The agents are characterized by an initial opinion (generally supposed to be between -1 and 1 as in the present study, or between 0 and 1) and a threshold that can be interpreted as an uncertainty around this opinion.</p>
                 <h3>The basic dynamic</h3>
                 <p>The dynamics presented on this page (<abbr class="bib" bib="Deffuant2001"></abbr>) picks random pairs of agents that influence each other by slightly moving their opinions towards each other, but only if the distance between their opinions is lower than the uncertainty. When all the agents share the same uncertainty (on the one or on the two as presented here opinion dimensions), the opinions progressively converge to a set of opinion clusters, with all agents of a cluster sharing the same opinion and with an increasing number of clusters when the uncertainty decreases.</p>
                 <table id="table1" class="table table-hover">
@@ -205,12 +206,12 @@
                 <script type="text/javascript">
                     add_presets("table1", [
                         ["4 clusters", 0, 0, 0.5, 0.5, 0.4, 0.4],
-                        ["26 clusters", 0, 0, 0.5, 0.5, 0.8, 0.8],
-                        ["1 cluster", 0, 0, 0.5, 0.5, 0.3, 0.1]
+                        ["1 cluster", 0, 0, 0.5, 0.5, 0.8, 0.8],
+                        ["26 clusters", 0, 0, 0.5, 0.5, 0.3, 0.1]
                     ]);
                 </script>
                 <h3>Adding extremists (with extreme opinions and very low uncertainties)</h3>
-                <p>With variants of this model, (<abbr class="bib" bib="Deffuant2006"></abbr> ; <abbr class="bib" bib="Mathias2016"></abbr>) study the impact of extremists on moderate agents. The extremists are initialized with extreme opinions (+1 or -1) and all share the same small uncertainty, whereas the moderates are initialized with an opinion uniformly drawn between -1 and +1 and the same larger uncertainty. By construction of the model, the extremists are more influential and less likely to change their opinions and uncertainties. Only for (<abbr class="bib" bib="Deffuant2006"></abbr>), both opinions and uncertainties are modified during interactions (only for(<abbr class="bib" bib="Deffuant2006"></abbr> ; <abbr class="bib" bib="Mathias2016"></abbr>)). The extremists tend to reduce the uncertainty of the moderates during interactions. This latter model is not presented here. For <abbr class="bib" bib="Mathias2016"></abbr>, the uncertainties remain constant. For a low uncertainty of moderates or a very small part of extremists, the model is equivalent to the basic dynamic.</p>
+                <p>With variants of this model, (<abbr class="bib" bib="Deffuant2006"></abbr> ; <abbr class="bib" bib="Mathias2016"></abbr>) study the impact of extremists on moderate agents. The extremists are initialized with extreme opinions (+1 or -1) and all share the same small uncertainty, whereas the moderates are initialized with an opinion uniformly drawn between -1 and +1 and the same larger uncertainty. By construction of the model, the extremists are more influential and less likely to change their opinions and uncertainties. Only for (<abbr class="bib" bib="Deffuant2006"></abbr>), both opinions and uncertainties are modified during interactions. The extremists tend to reduce the uncertainty of the moderates during interactions. This latter model is not presented here. For <abbr class="bib" bib="Mathias2016"></abbr>, the uncertainties remain constant. For a low uncertainty of moderates or a very small part of extremists, the model is equivalent to the basic dynamic.</p>
                 <p>For the other values, depending on the initial number of extremists and the initial uncertainty of the moderates, three convergence types appear: central clusters, double extreme clusters, single extreme cluster.(<abbr class="bib" bib="Mathias2016"></abbr>) exhibit a new stationary state appears when the uncertainties are fixed, for large uncertainties of the moderates. In this stationary state, the opinions of moderate agents keep fluctuating without clustering, altogether forming a stable density which shape changes significantly when the parameters vary (called here metastable state).</p>
                 <!--table id="table2" class="table table-hover">
                     <tbody></tbody>
@@ -228,7 +229,7 @@
                         ["Simple extreme", 0.3, 0, 0.5, 0.5, 0.8, 0.8],
                         ["Central convergence", 0.6, 0, 0.5, 0.5, 0.8, 0.8],
                         ["Double extreme", 0.6, 0, 0.5, 0.5, 1, 1],
-                        ["Double extreme metastable", 0.6, 0, 0.5, 0.5, 1.2, 1.2],
+                        ["Double extreme metastable", 0.6, 0, 0.5, 0.5, 1.7, 1.7],
                         ["Double extreme metastable and then single", 0.2, 0, 0.5, 0.5, 1.2, 1.2],
                         ["Moderate metastable", 0.05, 0, 0.5, 0.5, 1.2, 1.2]
                     ]);
@@ -258,7 +259,7 @@
                 var references = {
                     "Huet2010":{ cite: "Huet and Deffuant, 2010", text: "Huet, S., & Deffuant, G. (2010). Openness leads to opinion stability and narrowness to volatility. Advances in Complex Systems, 13(3), 405-423.", link: "http://motive.cemagref.fr/_publication/PUB00029104.pdf"},
 "Deffuant2006":{ cite:"Deffuant, 2006", text: "Deffuant, G. (2006). Comparing Extremism Propagation in Continuous Opinion Models. Journal of Artificial Societies and Social Simulation, 9(3).", link:"http://jasss.soc.surrey.ac.uk/9/3/8.html"},
-"Deffuant2007":{cite:"Deffuant and Huet, 2007", text: "Deffuant, G., & Huet, S. (2007). Propagation effects of filtering incongruent information. Journal of Business Research, 60(8), 816-825.", link:"http://www.sciencedirect.com/science/article/pii/S0148296307000380"},
+"Huet2008":{cite:"Huet, S., Deffuant, G., & Jager, W. (2008 d). Rejection Mechanism in 2D Bounded Confidence Provides More Conformity. Advances in Complex Systems, 11 (4), 1-21.", link:"http://arxiv.org/pdf/1404.7270.pdf"},
 "Deffuant2001":{cite: "Deffuant et al., 2001", text: "Deffuant, G., Neau, D., Amblard, F., & Weisbuch, G. (2001). Mixing beliefs among interacting agents. Advances in Complex Systems(3), 87-98. ", link:"http://wwwlisc.clermont.cemagref.fr/imagesproject/finalreport/mixbel.pdf"},
 "Festinger1954":{cite: "Festinger, 1954", text: "Festinger, L. (1954). A theory of social comparison processes. Human Relations, 7(2), 117-140.", link:"https://www.humanscience.org/docs/Festinger%20(1954)%20A%20Theory%20of%20Social%20Comparison%20Processes.pdf"},
 "Hegselmann2002":{cite: "Hegselmann and Krause, 2002", text: "Hegselmann, R., & Krause, U. (2002). Opinion Dynamics and Bounded Confidence Models, Analysis and Simulation. Journal of Artificial Societies and Social Simulation, 5(3).", link:"http://jasss.soc.surrey.ac.uk/5/3/2/2.pdf"},
@@ -282,8 +283,11 @@
                 });
                 var referencesList=$('#references');
                 $.each(references, function(i, ref){
-                    //console.log(e);
-                    referencesList.append('<dt>'+ref.cite+'</dt><dd>'+ref.text+' <a href="'+ref.link+'" target="_blank">Read online</a></dd>');
+                    if ('link' in ref) {
+                        referencesList.append('<dt>'+ref.cite+'</dt><dd>'+ref.text+' <a href="'+ref.link+'" target="_blank">Read online</a></dd>');
+                    } else {
+                        referencesList.append('<dt>'+ref.cite+'</dt><dd>'+ref.text+'</dd>');
+                    }
                 });
             </script>
             <div id="about" class="container">
@@ -295,8 +299,8 @@
                     <div class="col-xs-8">
                         <p>This application has been produced by the <a href="http://motive.cemagref.fr/lisc/presentation">Laboratory of Engineering for Complex Systems</a> at the french institute <a href="http://www.irstea.fr/accueil">Irstea</a>. The source code of this webpage is <a href="https://github.com/NicolasDumoulin/modele-bc">available</a> under the <a href="http://www.gnu.org/licenses/gpl.html">GNU Public License</a>.</p>
                         <p>Authors: <ul>
-                            <li><a href="mailto:nicolas.dumoulin@irstea.fr">Nicolas Dumoulin</a>, technical contact</li>
-                            <li><a href="mailto:sylvie.huet@irstea.fr">Sylvie Huet</a>, model and documentation</li>
+                            <li><a href="mailto:nicolas.dumoulin@irstea.fr">Nicolas Dumoulin</a>, technical contact for this webpage</li>
+                            <li><a href="mailto:sylvie.huet@irstea.fr">Sylvie Huet</a>, model realisation and documentation</li>
                         </ul></p>
                         <p></p>
                     </div>
