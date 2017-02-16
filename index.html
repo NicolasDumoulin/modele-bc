@@ -19,6 +19,13 @@
             // 'presets' contains all the parameters presets indexed by their id.
             // each preset is an array containing first the name of the preset and then the parameter values
             var presets = {};
+            /**
+             * if a valid preset's name is given, it will display (above the parameters tab)
+             * the name of this preset to recall to the user that it has been selected.
+             * As soon as a parameter will be modified (except popsize and nbsteps), the message
+             * will be cleared.
+             * @param {type} presetName
+             */
             function updatePresetRecall(presetName) {
                 if ($('#presetRecall').attr('presetName') !== presetName) {
                     if (presetName.length>0) {
