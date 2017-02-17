@@ -304,10 +304,10 @@
                     $(this).text(ref.cite);
                     if ('link' in ref) {
                         $(this).attr('title', '<p>'+ref.text+'</p><p><a href="'+ref.link+'" target="_blank">Read online</a></p>');
-                        $(this).tooltip({html:true, delay: {hide:600}});                        
+                        $(this).tooltip({html:true, delay: {show:500, hide:800}});                        
                     } else {
                         $(this).attr('title', ref.text);
-                        $(this).tooltip({delay: {hide:600}});
+                        $(this).tooltip({delay: {show:500, hide:800}});
                     }
                 });
                 var referencesList=$('#references');
